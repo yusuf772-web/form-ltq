@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulir Data Santri</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Menggunakan gaya yang sama dengan Panel Admin */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* bg-gray-900 */
+            color: #d1d5db; /* text-gray-300 */
+        }
+
+        .card {
+            background-color: #1f2937; /* bg-gray-800 */
+            border: 1px solid #374151; /* border-gray-700 */
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            padding: 1.5rem; /* p-6 */
+        }
+
+        .required::after {
+            content: " *";
+            color: #f87171; /* text-red-400 */
+        }
+
+        /* Elemen Formulir */
+        .form-input, .form-select {
+            background-color: #374151; /* bg-gray-700 */
+            border: 1px solid #4b5563; /* border-gray-600 */
+            color: #f9fafb; /* text-gray-50 */
+            border-radius: 0.5rem; /* rounded-lg */
+            padding: 0.625rem 1rem; /* py-2.5 px-4 */
+            width: 100%;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #3b82f6; /* focus:border-blue-500 */
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+        }
+        
+        .form-input::placeholder {
+            color: #9ca3af; /* placeholder-gray-400 */
+        }
+
+        .form-radio {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid #4b5563;
+            border-radius: 50%;
+            display: inline-block;
+            vertical-align: middle;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .form-radio:checked {
+            border-color: #3b82f6;
+        }
+        .form-radio:checked::after {
+            content: '';
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 50%;
+            background-color: #3b82f6;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Tombol */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background-color: #2563eb;
+        }
+        .btn-primary:disabled {
+            background-color: #374151;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .btn-secondary {
+            background-color: #374151;
+            color: #d1d5db;
+        }
+        .btn-secondary:hover {
+            background-color: #4b5563;
+        }
+
+        /* Navigasi Tab */
+        .tab-btn {
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            color: #9ca3af;
+            transition: all 0.2s;
+            flex-grow: 1;
+            text-align: center;
+        }
+        .tab-btn:hover {
+            background-color: #374151;
+            color: #f9fafb;
+        }
+        .tab-btn.active {
+            background-color: #3b82f6;
+            color: white;
+            box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 lg:p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <div class="inline-flex items-center gap-3 bg-gray-800 px-4 py-2 rounded-lg">
+                <i data-lucide="file-text" class="w-6 h-6 text-blue-400"></i>
+                <h1 class="text-2xl font-bold text-white">Formulir Data Santri</h1>
+            </div>
+            <p class="text-gray-400 mt-2">Pilih dan isi formulir yang sesuai dengan kebutuhan Anda.</p>
+        </header>
+
+        <!-- Navigasi Pilihan Formulir -->
+        <div class="mb-8 p-1 bg-gray-900 rounded-lg flex space-x-1">
+            <button id="showForm1Btn" class="tab-btn active">
+                <i data-lucide="user-check" class="inline-block w-4 h-4 mr-2"></i>Data Santri
+            </button>
+            <button id="showForm2Btn" class="tab-btn">
+                <i data-lucide="book-audio" class="inline-block w-4 h-4 mr-2"></i>Tasmi'
+            </button>
+            <button id="showForm3Btn" class="tab-btn">
+                <i data-lucide="users" class="inline-block w-4 h-4 mr-2"></i>Halaqoh
+            </button>
+        </div>
+
+        <!-- Kontainer Formulir -->
+        <div class="space-y-6">
+            <!-- Formulir 1: Data Santri -->
+            <form id="form1" class="space-y-6">
+                <div class="card">
+                    <h3 class="text-lg font-semibold text-white mb-4">Informasi Dasar</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="namaPembimbing1" class="block text-sm font-medium text-gray-300 mb-1 required">Nama Pembimbing</label>
+                            <select id="namaPembimbing1" name="namaPembimbing1" class="form-select"></select>
+                        </div>
+                        <div>
+                            <label for="namaSantri1" class="block text-sm font-medium text-gray-300 mb-1 required">Nama Santri</label>
+                            <select id="namaSantri1" name="namaSantri1" class="form-select"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="text-lg font-semibold text-white mb-4">Detail Hafalan</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="totalHafalan1" class="block text-sm font-medium text-gray-300 mb-1 required">Total Hafalan</label>
+                            <input type="text" id="totalHafalan1" name="totalHafalan1" placeholder="Contoh: 10 juz (1-5)(30-26)" class="form-input">
+                        </div>
+                        <div>
+                            <label for="hafalanTerakhir1" class="block text-sm font-medium text-gray-300 mb-1 required">Hafalan Terakhir</label>
+                            <input type="text" id="hafalanTerakhir1" name="hafalanTerakhir1" placeholder="Contoh: Juz 30 An-naba: 12" class="form-input">
+                        </div>
+                        <div>
+                            <label for="ziyadahPages1" class="block text-sm font-medium text-gray-300 mb-1 required">Halaman Ziyadah (1 Bulan)</label>
+                            <input type="number" id="ziyadahPages1" name="ziyadahPages1" placeholder="Contoh: 11" class="form-input">
+                        </div>
+                        <div>
+                            <label for="murojaahPages1" class="block text-sm font-medium text-gray-300 mb-1">Halaman Murojaah (1 Bulan)</label>
+                            <input type="number" id="murojaahPages1" name="murojaahPages1" placeholder="Contoh: 11" class="form-input">
+                        </div>
+                        <div>
+                            <label for="nilaiItqon1" class="block text-sm font-medium text-gray-300 mb-1 required">Nilai Itqon</label>
+                            <input type="number" id="nilaiItqon1" name="nilaiItqon1" placeholder="40 - 90" class="form-input">
+                        </div>
+                        <div>
+                            <label for="nilaiTajwid1" class="block text-sm font-medium text-gray-300 mb-1">Nilai Tajwid</label>
+                            <input type="number" id="nilaiTajwid1" name="nilaiTajwid1" placeholder="40 - 90" class="form-input">
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Formulir 2: Tasmi' -->
+            <form id="form2" class="hidden space-y-6">
+                <div class="card">
+                    <h3 class="text-lg font-semibold text-white mb-4">Informasi Dasar</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="namaPembimbing2" class="block text-sm font-medium text-gray-300 mb-1 required">Nama Pembimbing</label>
+                            <select id="namaPembimbing2" name="namaPembimbing2" class="form-select"></select>
+                        </div>
+                        <div>
+                            <label for="namaSantri2" class="block text-sm font-medium text-gray-300 mb-1 required">Nama Santri</label>
+                            <select id="namaSantri2" name="namaSantri2" class="form-select"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                     <h3 class="text-lg font-semibold text-white mb-4">Detail Tasmi'</h3>
+                     <div>
+                        <label for="jumlahHafalanTasmi" class="block text-sm font-medium text-gray-300 mb-1 required">Jumlah Hafalan Yang Di Tasmi'</label>
+                        <input type="text" id="jumlahHafalanTasmi" name="jumlahHafalanTasmi" placeholder="Contoh: 2 Juz (30,29)" class="form-input">
+                    </div>
+                    <div class="mt-4">
+                        <label for="keteranganTasmi" class="block text-sm font-medium text-gray-300 mb-1 required">Keterangan</label>
+                        <select id="keteranganTasmi" name="keteranganTasmi" class="form-select">
+                            <option value="">Pilih Keterangan</option>
+                            <option value="sangat_kurang">Sangat Kurang</option>
+                            <option value="kurang">Kurang</option>
+                            <option value="bagus">Bagus</option>
+                            <option value="bagus_sekali">Bagus Sekali</option>
+                            <option value="sempurna">Sempurna</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Formulir 3: Halaqoh -->
+            <form id="form3" class="hidden space-y-6">
+                <div class="card">
+                    <h3 class="text-lg font-semibold text-white mb-4">Informasi Dasar</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="namaPembimbingHalaqoh" class="block text-sm font-medium text-gray-300 mb-1 required">Nama Pembimbing</label>
+                            <select id="namaPembimbingHalaqoh" name="namaPembimbingHalaqoh" class="form-select"></select>
+                        </div>
+                        <div>
+                            <label for="namaSantri3" class="block text-sm font-medium text-gray-300 mb-1 required">Nama Santri</label>
+                            <select id="namaSantri3" name="namaSantri3" class="form-select"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3 class="text-lg font-semibold text-white mb-4">Detail Kehadiran</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2 required">Kehadiran</label>
+                            <div class="space-y-2">
+                                <label class="flex items-center"><input type="radio" name="kehadiranHalaqoh" value="hadir" class="form-radio"><span class="ml-2">Hadir</span></label>
+                                <label class="flex items-center"><input type="radio" name="kehadiranHalaqoh" value="alpha" class="form-radio"><span class="ml-2">Alpha</span></label>
+                                <label class="flex items-center"><input type="radio" name="kehadiranHalaqoh" value="sakit" class="form-radio"><span class="ml-2">Sakit</span></label>
+                                <label class="flex items-center"><input type="radio" name="kehadiranHalaqoh" value="izin" class="form-radio"><span class="ml-2">Izin</span></label>
+                            </div>
+                        </div>
+                         <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Waktu Halaqoh</label>
+                            <div class="space-y-2">
+                                <label class="flex items-center"><input type="radio" name="waktuHalaqoh" value="pagi" class="form-radio"><span class="ml-2">Pagi</span></label>
+                                <label class="flex items-center"><input type="radio" name="waktuHalaqoh" value="sore" class="form-radio"><span class="ml-2">Sore</span></label>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="mt-4">
+                        <label for="keteranganTambahan" class="block text-sm font-medium text-gray-300 mb-1">Keterangan Tambahan</label>
+                        <input type="text" id="keteranganTambahan" name="keteranganTambahan" placeholder="Isi jika ada keterangan tambahan" class="form-input">
+                    </div>
+                </div>
+            </form>
+            
+            <!-- Tombol Aksi -->
+            <div class="flex justify-end items-center gap-4 pt-4">
+                <button id="resetBtn" type="button" class="btn btn-secondary">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4 mr-2"></i>Kosongkan
+                </button>
+                <button id="submitBtn" type="submit" class="btn btn-primary">
+                    <i data-lucide="send" class="w-4 h-4 mr-2"></i>Kirim Data
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Message -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300">
+        <p id="toastMessage"></p>
+    </div>
+
+    <script type="module">
+        // --- Firebase SDK Imports ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- Firebase Configuration ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyBzvOsp5EVnzTI8Kbew9nXSXXLpakBD6Ec",
+            authDomain: "ltq-hn.firebaseapp.com",
+            projectId: "ltq-hn",
+            storageBucket: "ltq-hn.appspot.com",
+            messagingSenderId: "542731528480",
+            appId: "1:542731528480:web:15203f68716ed2e3dacf45"
+        };
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // --- Initialize Firebase ---
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // --- Global State ---
+        let currentUserId = null;
+        let activeFormId = 'form1';
+        let unsubscribes = [];
+        let allMentors = [];
+        let allStudents = [];
+        let allHalaqohGroups = [];
+
+        // --- DOM Elements ---
+        const dom = {
+            forms: {
+                form1: document.getElementById('form1'),
+                form2: document.getElementById('form2'),
+                form3: document.getElementById('form3'),
+            },
+            buttons: {
+                showForm1Btn: document.getElementById('showForm1Btn'),
+                showForm2Btn: document.getElementById('showForm2Btn'),
+                showForm3Btn: document.getElementById('showForm3Btn'),
+                submitBtn: document.getElementById('submitBtn'),
+                resetBtn: document.getElementById('resetBtn'),
+            },
+            selects: {
+                namaPembimbing1: document.getElementById('namaPembimbing1'),
+                namaSantri1: document.getElementById('namaSantri1'),
+                namaPembimbing2: document.getElementById('namaPembimbing2'),
+                namaSantri2: document.getElementById('namaSantri2'),
+                namaPembimbingHalaqoh: document.getElementById('namaPembimbingHalaqoh'),
+                namaSantri3: document.getElementById('namaSantri3'),
+            },
+            toast: document.getElementById('toast'),
+            toastMessage: document.getElementById('toastMessage'),
+        };
+
+        // --- UI Logic ---
+        const showToast = (message, isError = false) => {
+            dom.toastMessage.textContent = message;
+            dom.toast.className = `fixed bottom-5 right-5 text-white py-2 px-4 rounded-lg shadow-lg transform translate-y-0 opacity-100 transition-all duration-300 ${isError ? 'bg-red-500' : 'bg-green-500'}`;
+            setTimeout(() => {
+                dom.toast.className = dom.toast.className.replace('translate-y-0 opacity-100', 'translate-y-20 opacity-0');
+            }, 3000);
+        };
+
+        const switchForm = (formId) => {
+            activeFormId = formId;
+            Object.values(dom.forms).forEach(form => form.classList.add('hidden'));
+            Object.values(dom.buttons).forEach(btn => btn.classList.remove('active'));
+
+            dom.forms[formId].classList.remove('hidden');
+            dom.buttons[`show${formId.charAt(0).toUpperCase() + formId.slice(1)}Btn`].classList.add('active');
+        };
+
+        // --- Data Fetching & Population ---
+        const populateSelect = (selectElement, items, placeholder, valueKey = 'id', textKey = 'name') => {
+            if (!selectElement) return;
+            const currentValue = selectElement.value;
+            selectElement.innerHTML = `<option value="">${placeholder}</option>`;
+            items.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item[valueKey];
+                option.textContent = item[textKey];
+                selectElement.appendChild(option);
+            });
+            selectElement.value = currentValue;
+        };
+
+        const createDataListener = (collectionName, orderByField, callback) => {
+            const q = query(collection(db, 'artifacts', appId, 'public', 'data', collectionName), orderBy(orderByField));
+            const unsubscribe = onSnapshot(q, (snapshot) => {
+                const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                callback(items);
+            }, (error) => {
+                console.error(`Error fetching ${collectionName}:`, error);
+                showToast(`Gagal memuat data ${collectionName}.`, true);
+            });
+            unsubscribes.push(unsubscribe);
+        };
+        
+        // FIXED: New function to populate students based on selected mentor
+        const populateStudentsByMentor = (mentorId, formNumber) => {
+            const studentSelect = dom.selects[`namaSantri${formNumber}`];
+            if (!studentSelect) return;
+
+            if (!mentorId) {
+                populateSelect(studentSelect, [], 'Pilih pembimbing dulu', 'name', 'name');
+                return;
+            }
+
+            const group = allHalaqohGroups.find(g => g.mentorId === mentorId);
+            if (!group || !group.studentIds) {
+                populateSelect(studentSelect, [], 'Tidak ada grup untuk pembimbing ini', 'name', 'name');
+                return;
+            }
+
+            const studentsInGroup = allStudents.filter(s => group.studentIds.includes(s.id));
+            populateSelect(studentSelect, studentsInGroup, 'Pilih Santri', 'name', 'name');
+        };
+
+        // --- Authentication ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUserId = user.uid;
+                unsubscribes.forEach(unsub => unsub());
+                unsubscribes = [];
+
+                createDataListener('students', 'name', (items) => { allStudents = items; });
+                createDataListener('halaqohGroups', 'groupName', (items) => { allHalaqohGroups = items; });
+                createDataListener('mentors', 'name', (items) => {
+                    allMentors = items;
+                    populateSelect(dom.selects.namaPembimbing1, allMentors, 'Pilih Pembimbing');
+                    populateSelect(dom.selects.namaPembimbing2, allMentors, 'Pilih Pembimbing');
+                    populateSelect(dom.selects.namaPembimbingHalaqoh, allMentors, 'Pilih Pembimbing');
+                });
+            } else {
+                try {
+                    await (initialAuthToken ? signInWithCustomToken(auth, initialAuthToken) : signInAnonymously(auth));
+                } catch (error) {
+                    console.error("Authentication error:", error);
+                    showToast("Error autentikasi: " + error.message, true);
+                }
+            }
+        });
+
+        // --- Event Listeners ---
+        dom.buttons.showForm1Btn.addEventListener('click', () => switchForm('form1'));
+        dom.buttons.showForm2Btn.addEventListener('click', () => switchForm('form2'));
+        dom.buttons.showForm3Btn.addEventListener('click', () => switchForm('form3'));
+
+        // FIXED: Add change listeners to mentor dropdowns
+        dom.selects.namaPembimbing1.addEventListener('change', (e) => populateStudentsByMentor(e.target.value, 1));
+        dom.selects.namaPembimbing2.addEventListener('change', (e) => populateStudentsByMentor(e.target.value, 2));
+        dom.selects.namaPembimbingHalaqoh.addEventListener('change', (e) => populateStudentsByMentor(e.target.value, 3));
+
+
+        dom.buttons.resetBtn.addEventListener('click', () => {
+            dom.forms[activeFormId].reset();
+            // After reset, clear the student dropdown as well
+            const formNumber = activeFormId.replace('form', '');
+            populateSelect(dom.selects[`namaSantri${formNumber}`], [], 'Pilih pembimbing dulu', 'name', 'name');
+            showToast('Formulir dibersihkan.');
+        });
+
+        dom.buttons.submitBtn.addEventListener('click', async () => {
+            if (!currentUserId) {
+                showToast("Autentikasi diperlukan. Harap tunggu.", true);
+                return;
+            }
+
+            const form = dom.forms[activeFormId];
+            const formData = new FormData(form);
+            const data = {
+                formType: activeFormId,
+                userId: currentUserId,
+                timestamp: serverTimestamp(),
+            };
+
+            let isValid = true;
+            form.querySelectorAll('[required]').forEach(input => {
+                if (input.type === 'radio') {
+                    const radioGroup = form.querySelectorAll(`input[name="${input.name}"]`);
+                    if (![...radioGroup].some(r => r.checked)) {
+                        isValid = false;
+                    }
+                } else if (!input.value) {
+                    isValid = false;
+                }
+            });
+
+            if (!isValid) {
+                showToast("Harap isi semua bidang yang wajib diisi.", true);
+                return;
+            }
+            
+            for (let [key, value] of formData.entries()) {
+                if (key.startsWith('namaPembimbing')) {
+                    // Save mentor name instead of ID
+                    const selectedMentor = allMentors.find(m => m.id === value);
+                    data[key] = selectedMentor ? selectedMentor.name : '';
+                } else {
+                    data[key] = value;
+                }
+            }
+            
+            dom.buttons.submitBtn.disabled = true;
+            dom.buttons.submitBtn.innerHTML = '<i class="w-4 h-4 mr-2 animate-spin" data-lucide="loader"></i> Mengirim...';
+            lucide.createIcons();
+
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'formSubmissions'), data);
+                showToast("Data berhasil dikirim!", false);
+                form.reset();
+                const formNumber = activeFormId.replace('form', '');
+                populateSelect(dom.selects[`namaSantri${formNumber}`], [], 'Pilih pembimbing dulu', 'name', 'name');
+            } catch (e) {
+                console.error("Error adding document: ", e);
+                showToast("Gagal mengirim data: " + e.message, true);
+            } finally {
+                dom.buttons.submitBtn.disabled = false;
+                dom.buttons.submitBtn.innerHTML = '<i data-lucide="send" class="w-4 h-4 mr-2"></i>Kirim Data';
+                lucide.createIcons();
+            }
+        });
+
+        // --- Initial Setup ---
+        switchForm('form1'); // Show form 1 by default
+        lucide.createIcons();
+
+        window.addEventListener('beforeunload', () => {
+            unsubscribes.forEach(unsub => unsub());
+        });
+    </script>
+</body>
+</html>
