@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulir Data Santri</title>
+
+    <!-- PWA Manifest and Theme Color -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#111827">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -315,7 +319,83 @@
         // --- Firebase SDK Imports ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- PWA Setup ---
+        // This part creates the manifest and service worker files dynamically.
+        // You don't need to create separate files.
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Create Manifest File Dynamically
+            const manifest = {
+                "short_name": "Data Santri",
+                "name": "Formulir Data Santri",
+                "icons": [
+                    {
+                        "src": "https://placehold.co/192x192/3b82f6/ffffff?text=DS",
+                        "type": "image/png",
+                        "sizes": "192x192"
+                    },
+                    {
+                        "src": "https://placehold.co/512x512/3b82f6/ffffff?text=Data+Santri",
+                        "type": "image/png",
+                        "sizes": "512x512"
+                    }
+                ],
+                "start_url": ".",
+                "display": "standalone",
+                "theme_color": "#111827",
+                "background_color": "#1f2937"
+            };
+            const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+            const manifestURL = URL.createObjectURL(manifestBlob);
+            document.querySelector('link[rel="manifest"]').setAttribute('href', manifestURL);
+
+            // 2. Register Service Worker
+            if ('serviceWorker' in navigator) {
+                const swContent = `
+                    const CACHE_NAME = 'santri-form-cache-v1';
+                    // This will cache the main HTML file itself, making it available offline.
+                    const urlsToCache = [
+                        '/',
+                        '/index.html' 
+                    ];
+
+                    self.addEventListener('install', event => {
+                        event.waitUntil(
+                            caches.open(CACHE_NAME)
+                                .then(cache => {
+                                    console.log('Opened cache');
+                                    return cache.addAll(urlsToCache);
+                                })
+                        );
+                    });
+
+                    self.addEventListener('fetch', event => {
+                        event.respondWith(
+                            caches.match(event.request)
+                                .then(response => {
+                                    // Cache hit - return response
+                                    if (response) {
+                                        return response;
+                                    }
+                                    return fetch(event.request);
+                                })
+                        );
+                    });
+                `;
+                const swBlob = new Blob([swContent], { type: 'application/javascript' });
+                const swURL = URL.createObjectURL(swBlob);
+
+                navigator.serviceWorker.register(swURL)
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            }
+        });
+
 
         // --- Firebase Configuration ---
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -380,10 +460,16 @@
         const switchForm = (formId) => {
             activeFormId = formId;
             Object.values(dom.forms).forEach(form => form.classList.add('hidden'));
-            Object.values(dom.buttons).forEach(btn => btn.classList.remove('active'));
+            
+            // This is a safer way to handle button state
+            const buttons = [dom.buttons.showForm1Btn, dom.buttons.showForm2Btn, dom.buttons.showForm3Btn];
+            buttons.forEach(btn => btn.classList.remove('active'));
 
             dom.forms[formId].classList.remove('hidden');
-            dom.buttons[`show${formId.charAt(0).toUpperCase() + formId.slice(1)}Btn`].classList.add('active');
+            const activeBtnId = `show${formId.charAt(0).toUpperCase() + formId.slice(1)}Btn`;
+            if(dom.buttons[activeBtnId]) {
+                 dom.buttons[activeBtnId].classList.add('active');
+            }
         };
 
         // --- Data Fetching & Population ---
@@ -391,7 +477,7 @@
             if (!selectElement) return;
             const currentValue = selectElement.value;
             selectElement.innerHTML = `<option value="">${placeholder}</option>`;
-            items.forEach(item => {
+            items.sort((a, b) => a[textKey].localeCompare(b[textKey])).forEach(item => {
                 const option = document.createElement('option');
                 option.value = item[valueKey];
                 option.textContent = item[textKey];
@@ -400,8 +486,8 @@
             selectElement.value = currentValue;
         };
 
-        const createDataListener = (collectionName, orderByField, callback) => {
-            const q = query(collection(db, 'artifacts', appId, 'public', 'data', collectionName), orderBy(orderByField));
+        const createDataListener = (collectionName, callback) => {
+            const q = query(collection(db, 'artifacts', appId, 'public', 'data', collectionName));
             const unsubscribe = onSnapshot(q, (snapshot) => {
                 const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 callback(items);
@@ -412,7 +498,6 @@
             unsubscribes.push(unsubscribe);
         };
         
-        // FIXED: New function to populate students based on selected mentor
         const populateStudentsByMentor = (mentorId, formNumber) => {
             const studentSelect = dom.selects[`namaSantri${formNumber}`];
             if (!studentSelect) return;
@@ -424,7 +509,7 @@
 
             const group = allHalaqohGroups.find(g => g.mentorId === mentorId);
             if (!group || !group.studentIds) {
-                populateSelect(studentSelect, [], 'Tidak ada grup untuk pembimbing ini', 'name', 'name');
+                populateSelect(studentSelect, [], 'Tidak ada santri di grup ini', 'name', 'name');
                 return;
             }
 
@@ -439,9 +524,9 @@
                 unsubscribes.forEach(unsub => unsub());
                 unsubscribes = [];
 
-                createDataListener('students', 'name', (items) => { allStudents = items; });
-                createDataListener('halaqohGroups', 'groupName', (items) => { allHalaqohGroups = items; });
-                createDataListener('mentors', 'name', (items) => {
+                createDataListener('students', (items) => { allStudents = items; });
+                createDataListener('halaqohGroups', (items) => { allHalaqohGroups = items; });
+                createDataListener('mentors', (items) => {
                     allMentors = items;
                     populateSelect(dom.selects.namaPembimbing1, allMentors, 'Pilih Pembimbing');
                     populateSelect(dom.selects.namaPembimbing2, allMentors, 'Pilih Pembimbing');
@@ -462,15 +547,12 @@
         dom.buttons.showForm2Btn.addEventListener('click', () => switchForm('form2'));
         dom.buttons.showForm3Btn.addEventListener('click', () => switchForm('form3'));
 
-        // FIXED: Add change listeners to mentor dropdowns
         dom.selects.namaPembimbing1.addEventListener('change', (e) => populateStudentsByMentor(e.target.value, 1));
         dom.selects.namaPembimbing2.addEventListener('change', (e) => populateStudentsByMentor(e.target.value, 2));
         dom.selects.namaPembimbingHalaqoh.addEventListener('change', (e) => populateStudentsByMentor(e.target.value, 3));
 
-
         dom.buttons.resetBtn.addEventListener('click', () => {
             dom.forms[activeFormId].reset();
-            // After reset, clear the student dropdown as well
             const formNumber = activeFormId.replace('form', '');
             populateSelect(dom.selects[`namaSantri${formNumber}`], [], 'Pilih pembimbing dulu', 'name', 'name');
             showToast('Formulir dibersihkan.');
@@ -497,7 +579,7 @@
                     if (![...radioGroup].some(r => r.checked)) {
                         isValid = false;
                     }
-                } else if (!input.value) {
+                } else if (!input.value.trim()) {
                     isValid = false;
                 }
             });
@@ -509,7 +591,6 @@
             
             for (let [key, value] of formData.entries()) {
                 if (key.startsWith('namaPembimbing')) {
-                    // Save mentor name instead of ID
                     const selectedMentor = allMentors.find(m => m.id === value);
                     data[key] = selectedMentor ? selectedMentor.name : '';
                 } else {
