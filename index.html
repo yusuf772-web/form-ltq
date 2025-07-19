@@ -12,7 +12,11 @@
     <!-- Apple Specific Meta Tags for Full Screen -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Perkembangan Santri">
+    <meta name="apple-mobile-web-app-title" content="Data Santri">
+    
+    <!-- Apple Touch Icon (Ganti URL ini dengan URL permanen Anda) -->
+    <link rel="apple-touch-icon" href="https://media-cgk1-1.cdn.whatsapp.net/v/t61.24694-24/363056246_1752942365123195_5334038125114313387_n.jpg?ccb=11-4&oh=01_Q5Aa2AEZbzwvM0oXONlfZSvfMAiSRJuxztkjz73FUoxOcyOHfw&oe=68881332&_nc_sid=5e03e0&_nc_cat=111">
+
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -167,13 +171,13 @@
         <!-- Navigasi Pilihan Formulir -->
         <div class="mb-8 p-1 bg-gray-900 rounded-lg flex space-x-1">
             <button id="showForm1Btn" class="tab-btn active">
-                <i data-lucide="user-check" class="inline-block w-4 h-4 mr-2"></i>Pekembangan
+                <i data-lucide="user-check" class="inline-block w-4 h-4 mr-2"></i>Perkembangan
             </button>
             <button id="showForm2Btn" class="tab-btn">
                 <i data-lucide="book-audio" class="inline-block w-4 h-4 mr-2"></i>Tasmi
             </button>
             <button id="showForm3Btn" class="tab-btn">
-                <i data-lucide="users" class="inline-block w-4 h-4 mr-2"></i>Absensi
+                <i data-lucide="users" class="inline-block w-4 h-4 mr-2"></i>Absen
             </button>
         </div>
 
@@ -334,13 +338,15 @@
                 "name": "Formulir Data Santri",
                 "icons": [
                     {
-                        "src": "https://placehold.co/192x192/3b82f6/ffffff?text=DS",
-                        "type": "image/png",
+                        // GANTI URL INI dengan URL permanen Anda (ukuran 192x192)
+                        "src": "https://media-cgk1-1.cdn.whatsapp.net/v/t61.24694-24/363056246_1752942365123195_5334038125114313387_n.jpg?ccb=11-4&oh=01_Q5Aa2AEZbzwvM0oXONlfZSvfMAiSRJuxztkjz73FUoxOcyOHfw&oe=68881332&_nc_sid=5e03e0&_nc_cat=111",
+                        "type": "image/jpeg",
                         "sizes": "192x192"
                     },
                     {
-                        "src": "https://placehold.co/512x512/3b82f6/ffffff?text=Data+Santri",
-                        "type": "image/png",
+                        // GANTI URL INI dengan URL permanen Anda (ukuran 512x512)
+                        "src": "https://media-cgk1-1.cdn.whatsapp.net/v/t61.24694-24/363056246_1752942365123195_5334038125114313387_n.jpg?ccb=11-4&oh=01_Q5Aa2AEZbzwvM0oXONlfZSvfMAiSRJuxztkjz73FUoxOcyOHfw&oe=688813-32&_nc_sid=5e03e0&_nc_cat=111",
+                        "type": "image/jpeg",
                         "sizes": "512x512"
                     }
                 ],
@@ -358,7 +364,7 @@
             // 2. Register Service Worker
             if ('serviceWorker' in navigator) {
                 const swContent = `
-                    const CACHE_NAME = 'santri-form-cache-v3'; // Cache version updated
+                    const CACHE_NAME = 'santri-form-cache-v4'; // Cache version updated for icon change
                     const urlsToCache = [
                         '.', // Caches the root directory, which is more robust
                     ];
