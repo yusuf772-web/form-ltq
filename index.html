@@ -9,6 +9,11 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#111827">
     
+    <!-- Apple Specific Meta Tags for Full Screen -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Data Santri">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -353,7 +358,7 @@
             // 2. Register Service Worker
             if ('serviceWorker' in navigator) {
                 const swContent = `
-                    const CACHE_NAME = 'santri-form-cache-v2'; // Cache version updated
+                    const CACHE_NAME = 'santri-form-cache-v3'; // Cache version updated
                     const urlsToCache = [
                         '.', // Caches the root directory, which is more robust
                     ];
