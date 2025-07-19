@@ -322,8 +322,6 @@
         import { getFirestore, collection, addDoc, onSnapshot, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- PWA Setup ---
-        // This part creates the manifest and service worker files dynamically.
-        // You don't need to create separate files.
         document.addEventListener('DOMContentLoaded', () => {
             // 1. Create Manifest File Dynamically
             const manifest = {
@@ -341,7 +339,9 @@
                         "sizes": "512x512"
                     }
                 ],
+                "scope": ".",
                 "start_url": ".",
+                "display_override": ["standalone"],
                 "display": "standalone",
                 "theme_color": "#111827",
                 "background_color": "#1f2937"
@@ -353,11 +353,9 @@
             // 2. Register Service Worker
             if ('serviceWorker' in navigator) {
                 const swContent = `
-                    const CACHE_NAME = 'santri-form-cache-v1';
-                    // This will cache the main HTML file itself, making it available offline.
+                    const CACHE_NAME = 'santri-form-cache-v2'; // Cache version updated
                     const urlsToCache = [
-                        '/',
-                        '/index.html' 
+                        '.', // Caches the root directory, which is more robust
                     ];
 
                     self.addEventListener('install', event => {
@@ -374,13 +372,25 @@
                         event.respondWith(
                             caches.match(event.request)
                                 .then(response => {
-                                    // Cache hit - return response
-                                    if (response) {
-                                        return response;
-                                    }
-                                    return fetch(event.request);
+                                    return response || fetch(event.request);
                                 })
                         );
+                    });
+
+                    // Clean up old caches
+                    self.addEventListener('activate', event => {
+                      const cacheWhitelist = [CACHE_NAME];
+                      event.waitUntil(
+                        caches.keys().then(cacheNames => {
+                          return Promise.all(
+                            cacheNames.map(cacheName => {
+                              if (cacheWhitelist.indexOf(cacheName) === -1) {
+                                return caches.delete(cacheName);
+                              }
+                            })
+                          );
+                        })
+                      );
                     });
                 `;
                 const swBlob = new Blob([swContent], { type: 'application/javascript' });
@@ -461,7 +471,6 @@
             activeFormId = formId;
             Object.values(dom.forms).forEach(form => form.classList.add('hidden'));
             
-            // This is a safer way to handle button state
             const buttons = [dom.buttons.showForm1Btn, dom.buttons.showForm2Btn, dom.buttons.showForm3Btn];
             buttons.forEach(btn => btn.classList.remove('active'));
 
