@@ -707,21 +707,6 @@
             });
 
             for (let [key, value] of formData.entries()) {
-            
-                // Tambah otomatis "Juz" di belakang Total Hafalan & Jumlah Hafalan Tasmi'
-                if (key === 'totalHafalan1' || key === 'jumlahHafalanTasmi') {
-                    if (value && !/juz/i.test(value)) {
-                        value = value.trim() + ' Juz';
-                    }
-                }
-            
-                // Tambah otomatis "Halaman" di belakang input halaman
-                if (key === 'ziyadahPages1' || key === 'murojaahPages1') {
-                    if (value && !/halaman/i.test(value)) {
-                        value = value.toString().trim() + ' Halaman';
-                    }
-                }
-            
                 if (key.startsWith('namaPembimbing')) {
                     const selectedMentor = allMentors.find(m => m.id === value);
                     data[key] = selectedMentor ? selectedMentor.name : '';
