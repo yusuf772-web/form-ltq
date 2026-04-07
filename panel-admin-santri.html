@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin - LTQ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <style>
+        body { 
+            overflow: hidden; 
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; 
+        }
+        
+        .main-scroll { 
+            padding: 2rem; 
+            overflow-y: auto; 
+            height: 100vh; 
+            background: radial-gradient(circle at top right, #1e293b, #0f172a);
+            color: #e2e8f0; 
+        }
+
+        /* --- Modern Form Inputs --- */
+        .form-input, .form-select {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(71, 85, 105, 0.5);
+            color: #f8fafc;
+            border-radius: 0.75rem; 
+            padding: 0.625rem 1rem; 
+            width: 100%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(8px);
+        }
+        
+        .form-input:focus, .form-select:focus {
+            outline: none; 
+            border-color: #3b82f6; 
+            background: rgba(30, 41, 59, 0.9);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .form-input::placeholder { color: #64748b; }
+
+        /* --- Modern Cards --- */
+        .card {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 1.25rem; 
+            padding: 1.5rem;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transition: border-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.625rem 1.25rem; border-radius: 0.75rem;
+            font-weight: 600; border: none; cursor: pointer; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .btn-primary { 
+            background: linear-gradient(135deg, #3b82f6, #2563eb); 
+            color: white;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+        }
+        .btn-primary:hover { 
+            background: linear-gradient(135deg, #2563eb, #1d4ed8); 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+        }
+        
+        .btn-secondary { 
+            background: rgba(51, 65, 85, 0.5); 
+            color: #cbd5e1; 
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            backdrop-filter: blur(8px);
+        }
+        .btn-secondary:hover { background: rgba(71, 85, 105, 0.7); transform: translateY(-2px); }
+
+        .btn-danger { background-color: #ef4444; color: white; }
+        .btn-danger:hover { background-color: #dc2626; transform: translateY(-2px); }
+
+        .btn-icon { background: transparent; padding: 0.5rem; border-radius: 0.5rem; }
+        .btn-icon:hover { background: rgba(255,255,255,0.08); }
+
+        .tab-btn {
+            padding: 0.5rem 1rem; border-radius: 0.625rem;
+            font-weight: 500; color: #9ca3af; transition: all 0.2s;
+            flex-grow: 1; text-align: center; cursor: pointer;
+        }
+        .tab-btn:hover { color: #f9fafb; background: rgba(255,255,255,0.05); }
+        .tab-btn.active { 
+            background: linear-gradient(135deg, #3b82f6, #2563eb); 
+            color: white; 
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        /* --- Table --- */
+        .table-wrapper { overflow-x: auto; border-radius: 0.75rem; background: rgba(15, 23, 42, 0.3); }
+        .admin-table { width: 100%; border-collapse: collapse; }
+        .admin-table th { 
+            padding: 0.75rem 1rem; text-align: left; background: rgba(51, 65, 85, 0.5); 
+            font-weight: 600; color: #f1f5f9; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+        .admin-table td { 
+            padding: 0.625rem 1rem; 
+            border-bottom: 1px solid rgba(71, 85, 105, 0.2); 
+            color: #e2e8f0; 
+            font-size: 0.875rem;
+            vertical-align: middle;
+        }
+        .admin-table tr:hover { background: rgba(255,255,255,0.03); }
+
+        /* --- Modals --- */
+        .modal-backdrop { 
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center; z-index: 200; 
+            opacity: 0; visibility: hidden; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .modal-backdrop.visible { opacity: 1; visibility: visible; }
+        .modal-content { 
+            background: #1e293b; padding: 2rem; border-radius: 1.5rem; width: 90%; max-width: 500px; 
+            transform: scale(0.9) translateY(20px); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .modal-backdrop.visible .modal-content { transform: scale(1) translateY(0); }
+        #manageStudentsModal .modal-content { max-width: 800px; }
+
+        .skeleton { background: rgba(71, 85, 105, 0.3); border-radius: 0.5rem; animation: pulse 2s infinite; }
+        @keyframes pulse { 50% { opacity: .5; } }
+
+        /* Sticky Pagination */
+        #paginationControls { 
+            background: rgba(30, 41, 59, 0.9); 
+            backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Batasi tinggi list dan menyesuaikan secara dinamis dengan card di sebelahnya */
+        .scrollable-list {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+        .scrollable-list::-webkit-scrollbar { width: 6px; }
+        .scrollable-list::-webkit-scrollbar-track { background: transparent; }
+        .scrollable-list::-webkit-scrollbar-thumb { background: rgba(71, 85, 105, 0.6); border-radius: 4px; }
+        .scrollable-list::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.9); }
+
+        .admin-tab-content:not(.hidden) { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+        .admin-tab-content > div:first-child { flex-shrink: 0; }
+
+        /* --- Iframe Specific --- */
+        body.is-iframe .sidebar { display: none !important; }
+        body.is-iframe .main-area { width: 100% !important; margin-left: 0 !important; }
+        body.is-iframe .mobile-topbar { display: none !important; }
+        body.is-iframe .main-scroll { padding-top: 2rem !important; }
+
+        @media (max-width: 1024px) {
+            .main-scroll { padding: 1.25rem; }
+            .card { padding: 1rem; }
+        }
+    </style>
+    <script>
+        // Check if in iframe early
+        if (window.self !== window.top) {
+            document.documentElement.classList.add('is-iframe');
+            window.addEventListener('DOMContentLoaded', () => document.body.classList.add('is-iframe'));
+        }
+    </script>
+</head>
+<body>
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-brand-icon">
+                <i data-lucide="shield-check" class="text-white w-6 h-6"></i>
+            </div>
+            <div>
+                <div class="sidebar-title">Admin LTQ</div>
+                <div class="sidebar-subtitle">Panel Pengelolaan Data</div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="sidebar-section-label">Main Menu</div>
+            <a href="dashboard-ltq.html" class="sidebar-link">
+                <i data-lucide="layout-dashboard" class="sidebar-link-icon"></i> Dashboard
+            </a>
+            <a href="panel-admin-santri.html" class="sidebar-link active" style="background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); color: #60a5fa;">
+                <i data-lucide="settings-2" class="sidebar-link-icon"></i> Seting Halaqoh
+            </a>
+            <a href="rekapitulasi-santri.html" class="sidebar-link">
+                <i data-lucide="file-spreadsheet" class="sidebar-link-icon"></i> Rekapitulasi
+            </a>
+            <a href="index.html" class="sidebar-link">
+                <i data-lucide="form-input" class="sidebar-link-icon"></i> Formulir
+            </a>
+        </nav>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ===== MAIN AREA ===== -->
+    <div class="main-area flex-1">
+        
+        <!-- Mobile Topbar -->
+        <div class="mobile-topbar flex items-center justify-between p-4 bg-[#1e293b] border-b border-[#1e3a5f] lg:hidden">
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i data-lucide="menu" class="w-6 h-6 text-gray-400"></i>
+            </button>
+            <h1 class="text-white font-bold">Admin Panel</h1>
+            <div class="w-6"></div>
+        </div>
+
+        <div class="main-scroll">
+            
+            <!-- Page Header -->
+            <header class="mb-8">
+                <h1 class="text-3xl font-extrabold text-white mb-2">Seting Halaqoh</h1>
+                <p class="text-gray-400">Kelola data pembimbing, santri, kelas, dan grup halaqoh secara terpadu.</p>
+            </header>
+
+            <main class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Left: Forms and Table -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="card p-0">
+                        <div class="p-6">
+                            <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
+                                <h2 class="text-xl font-bold text-white">Submisi Formulir</h2>
+                                <div class="flex flex-wrap gap-2">
+                                    <select id="submissionMonthFilter" class="form-select text-xs w-32"></select>
+                                    <select id="formTypeFilter" class="form-select text-xs w-40">
+                                        <option value="">Semua Form</option>
+                                        <option value="form1">Perkembangan</option>
+                                        <option value="form2">Tasmi'</option>
+                                        <option value="form3">Absen</option>
+                                    </select>
+                                    <select id="itemsPerPageSelect" class="form-select text-xs w-28">
+                                        <option value="10">10 / hal</option>
+                                        <option value="25">25 / hal</option>
+                                        <option value="50">50 / hal</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-6 relative">
+                                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"></i>
+                                <input type="text" id="submissionSearchInput" placeholder="Cari santri atau pembimbing..." class="form-input pl-10 text-sm">
+                            </div>
+
+                            <div id="adminDataTableWrapper" class="table-wrapper">
+                                <div id="adminDataTableLoader" class="p-8">
+                                    <div class="space-y-3">
+                                        <div class="h-10 skeleton w-full"></div>
+                                        <div class="h-10 skeleton w-full"></div>
+                                        <div class="h-10 skeleton w-full"></div>
+                                    </div>
+                                </div>
+                                <div id="adminDataTable"></div>
+                            </div>
+                        </div>
+
+                        <!-- Pagination Footer -->
+                        <div id="paginationControls" class="hidden px-6 py-4 flex items-center justify-between rounded-b-2xl">
+                            <span id="paginationInfo" class="text-xs text-gray-400 font-medium"></span>
+                            <div class="flex items-center gap-2">
+                                <button id="prevPageBtn" class="btn btn-secondary px-3 py-1.5 text-xs">Prev</button>
+                                <div id="pageNumbers" class="flex gap-1"></div>
+                                <button id="nextPageBtn" class="btn btn-secondary px-3 py-1.5 text-xs">Next</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Tabs and Management -->
+                <div class="lg:col-span-1 relative">
+                    <div class="card p-0 lg:absolute lg:inset-0 flex flex-col max-h-[600px] lg:max-h-none w-full">
+                        <div class="p-4 border-b border-white/5 shrink-0">
+                            <div class="flex bg-slate-900/50 p-1 rounded-xl gap-1">
+                                <button id="showMentorsTabBtn" class="tab-btn active text-xs">Pembimbing</button>
+                                <button id="showStudentsTabBtn" class="tab-btn text-xs">Santri</button>
+                                <button id="showClassesTabBtn" class="tab-btn text-xs">Kelas</button>
+                                <button id="showHalaqohGroupsTabBtn" class="tab-btn text-xs">Grup</button>
+                            </div>
+                        </div>
+                        <div class="p-6 flex-1 flex flex-col min-h-0">
+                                <div class="flex flex-col sm:flex-row gap-4 mb-4 shrink-0">
+                                    <input type="text" id="groupSearchInput" placeholder="Cari..." class="form-input text-xs w-full">
+                                    <select id="studentListClassFilter" class="form-select text-xs w-full sm:w-48">
+                                        <option value="">Semua Kelas</option>
+                                    </select>
+                                </div>
+                                <!-- Tab Content Rendered by JS -->
+                                <div id="managementTabContent" class="mt-4 flex-1 flex flex-col min-h-0">
+                                    <div id="managementLoader" class="hidden space-y-4 mb-4">
+                                        <div class="h-24 skeleton w-full"></div>
+                                        <div class="h-24 skeleton w-full"></div>
+                                    </div>
+
+                                    <!-- Mentors Tab content -->
+                                    <div id="mentorsContent" class="admin-tab-content">
+                                        <div class="flex justify-between items-center mb-4">
+                                            <h3 class="text-white font-bold">Daftar Pembimbing</h3>
+                                            <button id="addMentorBtn" class="btn btn-primary btn-sm !px-3 !py-1.5 text-xs">Tambah</button>
+                                        </div>
+                                        <div id="mentorsList" class="scrollable-list space-y-2"></div>
+                                    </div>
+
+                                    <!-- Students Tab content -->
+                                    <div id="studentsContent" class="admin-tab-content hidden">
+                                        <div class="flex justify-between items-center mb-4">
+                                            <h3 class="text-white font-bold">Daftar Santri</h3>
+                                            <div class="flex gap-2">
+                                                <button id="bulkDeleteStudentsBtn" class="btn btn-danger btn-sm !px-3 !py-1.5 text-xs hidden">Hapus <span id="bulkDeleteCount">0</span></button>
+                                                <button id="addStudentBtn" class="btn btn-primary btn-sm !px-3 !py-1.5 text-xs">Tambah</button>
+                                            </div>
+                                        </div>
+                                        <div id="studentsList" class="scrollable-list space-y-2"></div>
+                                    </div>
+
+                                    <!-- Classes Tab content -->
+                                    <div id="classesContent" class="admin-tab-content hidden">
+                                        <div class="flex justify-between items-center mb-4">
+                                            <h3 class="text-white font-bold">Daftar Kelas</h3>
+                                            <button id="addClassBtn" class="btn btn-primary btn-sm !px-3 !py-1.5 text-xs">Tambah</button>
+                                        </div>
+                                        <div id="classesList" class="scrollable-list space-y-2"></div>
+                                    </div>
+
+                                    <!-- Groups Tab content -->
+                                    <div id="halaqohGroupsContent" class="admin-tab-content hidden">
+                                        <div class="flex justify-between items-center mb-4">
+                                            <h3 class="text-white font-bold">Grup Halaqoh</h3>
+                                            <button id="addHalaqohGroupBtn" class="btn btn-primary btn-sm !px-3 !py-1.5 text-xs">Tambah</button>
+                                        </div>
+                                        <div id="halaqohGroupsList" class="scrollable-list space-y-2"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Edit Submission Modal -->
+    <div id="editSubmissionModal" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="edit-submission-title" class="text-xl font-bold text-white">Edit Data</h3>
+                <button id="closeEditSubmissionModalBtn" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div id="edit-submission-body" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                <!-- Data Santri & Pembimbing -->
+                <div id="common-edit-fields" class="grid grid-cols-1 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-1">Santri</label>
+                        <input type="text" id="edit-common-namaSantri" class="form-input" disabled>
+                    </div>
+                </div>
+
+                <!-- Form 1 fields -->
+                <div id="edit-form1-fields" class="hidden space-y-3">
+                    <div>
+                        <label for="edit-f1-totalHafalan1" class="block text-sm font-medium text-gray-300 mb-1">Total Hafalan</label>
+                        <input type="text" id="edit-f1-totalHafalan1" class="form-input">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label for="edit-f1-nilaiItqon1" class="block text-sm font-medium text-gray-300 mb-1">Nilai Itqon</label>
+                            <input type="number" id="edit-f1-nilaiItqon1" step="0.1" class="form-input">
+                        </div>
+                        <div>
+                            <label for="edit-f1-nilaiTajwid1" class="block text-sm font-medium text-gray-300 mb-1">Nilai Tajwid</label>
+                            <input type="number" id="edit-f1-nilaiTajwid1" step="0.1" class="form-input">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Form 2 fields -->
+                <div id="edit-form2-fields" class="hidden space-y-3">
+                    <div>
+                        <label for="edit-f2-namaPembimbingMenyimak" class="block text-sm font-medium text-gray-300 mb-1">Pembimbing Menyimak</label>
+                        <select id="edit-f2-namaPembimbingMenyimak" class="form-select"></select>
+                    </div>
+                    <div>
+                        <label for="edit-f2-jumlahHafalanTasmi" class="block text-sm font-medium text-gray-300 mb-1">Jumlah Juz</label>
+                        <input type="text" id="edit-f2-jumlahHafalanTasmi" class="form-input">
+                    </div>
+                    <div>
+                        <label for="edit-f2-keteranganTasmi" class="block text-sm font-medium text-gray-300 mb-1">Keterangan</label>
+                        <select id="edit-f2-keteranganTasmi" class="form-select">
+                            <option value="sangat_kurang">Sangat Kurang</option>
+                            <option value="kurang">Kurang</option>
+                            <option value="bagus">Bagus</option>
+                            <option value="bagus_sekali">Bagus Sekali</option>
+                            <option value="sempurna">Sempurna</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Form 3 fields -->
+                <div id="edit-form3-fields" class="hidden space-y-3">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Kehadiran</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="flex items-center gap-2 ring-1 ring-slate-700 p-2 rounded-lg"><input type="radio" name="edit-f3-kehadiranHalaqoh" value="hadir"><span>Hadir</span></label>
+                            <label class="flex items-center gap-2 ring-1 ring-slate-700 p-2 rounded-lg"><input type="radio" name="edit-f3-kehadiranHalaqoh" value="alpha"><span>Alpha</span></label>
+                            <label class="flex items-center gap-2 ring-1 ring-slate-700 p-2 rounded-lg"><input type="radio" name="edit-f3-kehadiranHalaqoh" value="sakit"><span>Sakit</span></label>
+                            <label class="flex items-center gap-2 ring-1 ring-slate-700 p-2 rounded-lg"><input type="radio" name="edit-f3-kehadiranHalaqoh" value="izin"><span>Izin</span></label>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="edit-f3-keteranganTambahan" class="block text-sm font-medium text-gray-300 mb-1">Keterangan</label>
+                        <input type="text" id="edit-f3-keteranganTambahan" class="form-input">
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 mt-6">
+                <button id="cancelEditSubmissionBtn" class="btn btn-secondary">Batal</button>
+                <button id="saveEditSubmissionBtn" class="btn btn-primary">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal-backdrop">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold text-white mb-4">Konfirmasi Hapus</h3>
+            <p class="text-gray-400 mb-6">Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.</p>
+            <div class="flex justify-end gap-3">
+                <button id="cancelDeleteBtn" class="btn btn-secondary">Batal</button>
+                <button id="confirmDeleteBtn" class="btn btn-danger">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage Students Modal -->
+    <div id="manageStudentsModal" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="manageStudentsModalTitle" class="text-xl font-bold text-white">Kelola Anggota Halaqoh</h3>
+                <button id="closeManageStudentsModalBtn" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <input type="text" id="modalStudentSearch" placeholder="Cari santri..." class="form-input">
+                <select id="modalClassFilter" class="form-select">
+                    <option value="">Semua Kelas</option>
+                </select>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <h4 class="text-sm font-semibold text-gray-400 mb-2">Tersedia</h4>
+                    <div id="allStudentsListForModal" class="bg-gray-800/50 rounded-xl p-2 h-[300px] overflow-y-auto space-y-1"></div>
+                </div>
+                <div>
+                    <h4 class="text-sm font-semibold text-gray-400 mb-2">Anggota Saat Ini</h4>
+                    <div id="groupStudentsListForModal" class="bg-blue-900/20 ring-1 ring-blue-500/20 rounded-xl p-2 h-[300px] overflow-y-auto space-y-1"></div>
+                </div>
+            </div>
+            <div class="flex justify-end mt-6">
+                <button id="closeManageStudentsBtn" class="btn btn-primary">Selesai</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generic Entity Modal (For Add/Edit) -->
+    <div id="entityModal" class="modal-backdrop">
+        <div class="modal-content">
+            <h3 id="entityModalTitle" class="text-xl font-bold text-white mb-4">Tambah Data</h3>
+            <div id="entityModalFields" class="space-y-4"></div>
+            <div class="flex justify-end gap-3 mt-6">
+                <button id="cancelEntityBtn" class="btn btn-secondary">Batal</button>
+                <button id="saveEntityBtn" class="btn btn-primary">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 text-white py-2 px-4 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-[300]">
+        <p id="toastMessage"></p>
+    </div>
+
+    <script src="js/panel-admin-santri.js" type="module"></script>
+    <script>
+        // Sidebar logic
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', () => {
+                sidebar.style.transform = 'translateX(0)';
+                sidebarOverlay.style.display = 'block';
+            });
+        }
+
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', () => {
+                sidebar.style.transform = '';
+                sidebarOverlay.style.display = 'none';
+            });
+        }
+
+        // Lucide
+        lucide.createIcons();
+    </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+/* halaman.css - Milik Bersama Landing Page */
+body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #ffffff; color: #0f172a; overflow-x: hidden; }
+.glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.3); }
+.mesh-gradient { background-color: #ffffff; background-image: radial-gradient(at 0% 0%, hsla(225,100%,94%,1) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(225,100%,94%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(210,100%,96%,1) 0, transparent 50%); }
+.animate-float { animation: float 6s ease-in-out infinite; }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+.bento-card { transition: all 0.4s cubic-bezier(0.4,0,0.2,1); }
+.bento-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.05); background: rgba(255,255,255,0.9); }
+.hero-text-glow { text-shadow: 0 0 40px rgba(79,70,229,0.1); }
+.cta-button { transition: all 0.3s ease; position: relative; overflow: hidden; }
+.cta-button:after { content: ''; position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; background: rgba(255,255,255,0.2); transform: translate(-50%,-50%) rotate(45deg) scale(0); transition: transform 0.5s ease; }
+.cta-button:hover:after { transform: translate(-50%,-50%) rotate(45deg) scale(1); }

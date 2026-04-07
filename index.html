@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulir Perkembangan LTQ</title>
+    <meta name="theme-color" content="#0f172a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" id="manifest">
+    <link rel="apple-touch-icon" href="https://www.hidayatunnajah.or.id/wp-content/uploads/2025/07/WhatsApp-Image-2025-07-19-at-15.53.05.jpeg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Shared dashboard sidebar styles -->
+    <link rel="stylesheet" href="css/dashboard.css">
+    <style>
+        /* Override dashboard body to allow scrollable main area */
+        body { 
+            overflow: hidden; 
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; 
+        }
+        
+        .main-scroll { 
+            padding: 2rem; 
+            overflow-y: auto; 
+            height: 100vh; 
+            background: radial-gradient(circle at top right, #1e293b, #0f172a);
+            color: #e2e8f0; 
+        }
+
+        /* --- Modern Form Inputs --- */
+        .form-input, .form-select {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(71, 85, 105, 0.5);
+            color: #f8fafc;
+            border-radius: 0.75rem; 
+            padding: 0.75rem 1rem; 
+            width: 100%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(8px);
+        }
+        
+        .form-input:focus, .form-select:focus {
+            outline: none; 
+            border-color: #3b82f6; 
+            background: rgba(30, 41, 59, 0.9);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .form-input::placeholder { color: #64748b; }
+
+        /* --- Modern Cards --- */
+        .form-card {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 1.25rem; 
+            padding: 2rem;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .form-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.5), transparent);
+            opacity: 0.5;
+        }
+
+        .form-card:hover {
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        /* --- Accent Elements --- */
+        .form-radio {
+            -webkit-appearance: none; appearance: none;
+            width: 1.4rem; height: 1.4rem; border: 2px solid #475569;
+            border-radius: 50%; display: inline-block; vertical-align: middle;
+            position: relative; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(15, 23, 42, 0.5);
+        }
+        .form-radio:checked { border-color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+        .form-radio:checked::after {
+            content: ''; width: 0.7rem; height: 0.7rem; border-radius: 50%;
+            background-color: #3b82f6; position: absolute;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+        
+        .required::after { content: " *"; color: #ef4444; font-weight: bold; }
+
+        /* --- Buttons --- */
+        .action-btn {
+            display: inline-flex; align-items: center; gap: 0.6rem;
+            padding: 0.8rem 1.75rem; border-radius: 0.875rem;
+            font-weight: 600; border: none; cursor: pointer; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.95rem;
+        }
+        
+        .btn-primary { 
+            background: linear-gradient(135deg, #3b82f6, #2563eb); 
+            color: white;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.39);
+        }
+        .btn-primary:hover:not(:disabled) { 
+            background: linear-gradient(135deg, #2563eb, #1d4ed8); 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
+        }
+        .btn-primary:active { transform: translateY(0); }
+        .btn-primary:disabled { background: #334155; opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+        
+        .btn-secondary { 
+            background: rgba(51, 65, 85, 0.5); 
+            color: #cbd5e1; 
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            backdrop-filter: blur(8px);
+        }
+        .btn-secondary:hover { background: rgba(71, 85, 105, 0.7); color: white; transform: translateY(-2px); }
+
+        .toast {
+            position: fixed; bottom: 1.5rem; right: 1.5rem;
+            color: white; padding: 1rem 1.5rem; border-radius: 1rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+            transform: translateY(5rem); opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 200;
+            backdrop-filter: blur(12px);
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .hidden { display: none !important; }
+
+        /* --- Responsive --- */
+        @media (max-width: 1024px) {
+            .main-scroll { padding: 1.25rem; }
+            #headerIcon { width: 1.5rem !important; height: 1.5rem !important; }
+            .header-icon-box { padding: 0.6rem !important; border-radius: 0.75rem !important; }
+            #headerTitle { font-size: 1.25rem !important; }
+            #headerSubtitle { font-size: 0.8rem !important; }
+            .action-buttons { flex-direction: row; width: 100%; gap: 0.5rem; }
+            .action-btn { flex: 1; justify-content: center; padding: 0.75rem 1rem; font-size: 0.85rem; }
+            .form-card { padding: 1.25rem; border-radius: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar">
+
+        <!-- Brand -->
+        <div class="sidebar-brand">
+            <div class="sidebar-brand-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+            </div>
+            <div>
+                <div class="sidebar-title">Formulir LTQ</div>
+                <div class="sidebar-subtitle">Form Pembimbing Halaqoh</div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="sidebar-nav">
+            <div class="sidebar-section-label">Menu Formulir</div>
+
+            <button id="showForm1Btn" class="sidebar-link active"
+                style="border:none; width:100%; text-align:left; background: linear-gradient(135deg, rgba(59,130,246,0.25), rgba(29,78,216,0.15)); border:1px solid rgba(59,130,246,0.3); color:#60a5fa;">
+                <i data-lucide="user-check" class="sidebar-link-icon"></i>
+                Perkembangan
+            </button>
+
+            <button id="showForm2Btn" class="sidebar-link"
+                style="border:none; width:100%; text-align:left;">
+                <i data-lucide="book-audio" class="sidebar-link-icon"></i>
+                Tasmi'
+            </button>
+
+            <button id="showForm3Btn" class="sidebar-link"
+                style="border:none; width:100%; text-align:left;">
+                <i data-lucide="users" class="sidebar-link-icon"></i>
+                Absen
+            </button>
+        </nav>
+    </aside>
+
+    <!-- Sidebar Overlay (Mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ===== MAIN AREA ===== -->
+    <div class="main-area">
+
+        <!-- Mobile Topbar -->
+        <div class="mobile-topbar">
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i data-lucide="menu" style="width:22px;height:22px;"></i>
+            </button>
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+                <h1 id="mobileHeaderTitle">Form Pembimbing Halaqoh</h1>
+            </div>
+        </div>
+
+        <div class="main-scroll">
+
+            <header style="display:flex; align-items:center; gap:1rem; margin-bottom:1.5rem;">
+                <div id="headerIconBox" class="header-icon-box" style="background:#2563eb; padding:0.75rem; border-radius:0.75rem; flex-shrink:0; transition: background-color 0.3s ease; display:flex; align-items:center; justify-content:center;">
+                    <span id="headerIconContainer">
+                        <i data-lucide="user-check" style="width:2rem; height:2rem; color:white;"></i>
+                    </span>
+                </div>
+                <div>
+                    <h1 id="headerTitle" style="font-size:1.875rem; font-weight:700; color:white; margin:0;">Perkembangan Santri</h1>
+                    <p id="headerSubtitle" style="color:#9ca3af; margin:0;">Silakan isi formulir sesuai dengan menu yang dipilih.</p>
+                </div>
+            </header>
+
+            <!-- Form 1: Perkembangan -->
+            <form id="form1" style="display:flex; flex-direction:column; gap:1.25rem;">
+                <div class="form-card">
+                    <h3 class="text-lg font-semibold text-white mb-4">Informasi Dasar</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="namaPembimbing1" class="block text-sm font-medium text-gray-300 mb-1 required">Nama Pembimbing</label>
+                            <select id="namaPembimbing1" name="namaPembimbing1" class="form-select" required></select>
+                        </div>
+                        <div>
+                            <label for="namaSantri1" class="block text-sm font-medium text-gray-300 mb-1 required">Nama Santri</label>
+                            <select id="namaSantri1" name="namaSantri1" class="form-select" required></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-card">
+                    <h3 class="text-lg font-semibold text-white mb-4">Detail Hafalan</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="totalHafalan1" class="block text-sm font-medium text-gray-300 mb-1 required">Total Hafalan</label>
+                            <input type="text" id="totalHafalan1" name="totalHafalan1" placeholder="Contoh: 10 juz (1-5)(30-26)" class="form-input" required>
+                        </div>
+                        <div>
+                            <label for="hafalanTerakhir1" class="block text-sm font-medium text-gray-300 mb-1 required">Hafalan Terakhir</label>
+                            <input type="text" id="hafalanTerakhir1" name="hafalanTerakhir1" placeholder="Contoh: Juz 30 An-naba: 12" class="form-input" required>
+                        </div>
+                        <div>
+                            <label for="ziyadahPages1" class="block text-sm font-medium text-gray-300 mb-1 required">Halaman Ziyadah (1 Bulan)</label>
+                            <input type="number" id="ziyadahPages1" name="ziyadahPages1" placeholder="Contoh: 11" class="form-input" required>
+                        </div>
+                        <div>
+                            <label for="murojaahPages1" class="block text-sm font-medium text-gray-300 mb-1">Halaman Murojaah (1 Bulan)</label>
+                            <input type="number" id="murojaahPages1" name="murojaahPages1" placeholder="Contoh: 11" class="form-input">
+                        </div>
+                        <div>
+                            <label for="nilaiItqon1" class="block text-sm font-medium text-gray-300 mb-1 required">Nilai Itqon</label>
+                            <input type="number" id="nilaiItqon1" name="nilaiItqon1" placeholder="40 - 90" class="form-input" required>
+                        </div>
+                        <div>
+                            <label for="nilaiTajwid1" class="block text-sm font-medium text-gray-300 mb-1 required">Nilai Tajwid</label>
+                            <input type="number" id="nilaiTajwid1" name="nilaiTajwid1" placeholder="40 - 90" class="form-input" required>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Form 2: Tasmi' -->
+            <form id="form2" class="hidden" style="flex-direction:column; gap:1.25rem;">
+                <div class="form-card">
+                    <h3 class="text-lg font-semibold text-white mb-4">Informasi Dasar</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                            <label for="namaPembimbing2" class="block text-sm font-medium text-gray-300 mb-1 required">Nama Pembimbing</label>
+                            <select id="namaPembimbing2" name="namaPembimbing2" class="form-select" required></select>
+                        </div>
+                        <div>
+                            <label for="namaSantri2" class="block text-sm font-medium text-gray-300 mb-1 required">Nama Santri</label>
+                            <select id="namaSantri2" name="namaSantri2" class="form-select" required></select>
+                        </div>
+                        <div>
+                            <label for="namaPembimbingMenyimak" class="block text-sm font-medium text-gray-300 mb-1 required">Pembimbing yang Menyimak</label>
+                            <select id="namaPembimbingMenyimak" name="namaPembimbingMenyimak" class="form-select" required></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-card" style="margin-top:1.25rem;">
+                    <h3 class="text-lg font-semibold text-white mb-4">Detail Tasmi'</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="jumlahHafalanTasmi" class="block text-sm font-medium text-gray-300 mb-1 required">Jumlah Hafalan Yang Di Tasmi'</label>
+                            <input type="text" id="jumlahHafalanTasmi" name="jumlahHafalanTasmi" placeholder="Contoh: 2 Juz (30,29)" class="form-input" required>
+                        </div>
+                        <div>
+                            <label for="keteranganTasmi" class="block text-sm font-medium text-gray-300 mb-1 required">Keterangan</label>
+                            <select id="keteranganTasmi" name="keteranganTasmi" class="form-select" required>
+                                <option value="">Pilih Keterangan</option>
+                                <option value="sangat_kurang">Sangat Kurang</option>
+                                <option value="kurang">Kurang</option>
+                                <option value="bagus">Bagus</option>
+                                <option value="bagus_sekali">Bagus Sekali</option>
+                                <option value="sempurna">Sempurna</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Form 3: Absen -->
+            <form id="form3" class="hidden" style="flex-direction:column; gap:1.25rem;">
+                <div class="form-card">
+                    <h3 class="text-lg font-semibold text-white mb-4">Informasi Dasar</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="namaPembimbingHalaqoh" class="block text-sm font-medium text-gray-300 mb-1 required">Nama Pembimbing</label>
+                            <select id="namaPembimbingHalaqoh" name="namaPembimbingHalaqoh" class="form-select" required></select>
+                        </div>
+                        <div>
+                            <label for="namaSantri3" class="block text-sm font-medium text-gray-300 mb-1 required">Nama Santri</label>
+                            <select id="namaSantri3" name="namaSantri3" class="form-select" required></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-card" style="margin-top:1.25rem;">
+                    <h3 class="text-lg font-semibold text-white mb-4">Detail Kehadiran</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-3 required">Kehadiran</label>
+                            <div class="space-y-2">
+                                <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="kehadiranHalaqoh" value="alpha" class="form-radio" required><span>Alpha</span></label>
+                                <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="kehadiranHalaqoh" value="sakit" class="form-radio"><span>Sakit</span></label>
+                                <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="kehadiranHalaqoh" value="izin" class="form-radio"><span>Izin</span></label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-3 required">Waktu Halaqoh</label>
+                            <div class="space-y-2">
+                                <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="waktuHalaqoh" value="pagi" class="form-radio" required><span>Pagi</span></label>
+                                <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="waktuHalaqoh" value="sore" class="form-radio"><span>Sore</span></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <label for="keteranganTambahan" class="block text-sm font-medium text-gray-300 mb-1">Keterangan Tambahan</label>
+                        <input type="text" id="keteranganTambahan" name="keteranganTambahan" placeholder="Isi jika ada keterangan tambahan" class="form-input">
+                    </div>
+                </div>
+            </form>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons" style="display:flex; justify-content:flex-end; gap:0.75rem; margin-top:1.5rem;">
+                <button id="resetBtn" type="button" class="action-btn btn-secondary">
+                    <i data-lucide="rotate-ccw" style="width:1rem;height:1rem;"></i> Kosongkan
+                </button>
+                <button id="submitBtn" type="button" class="action-btn btn-primary">
+                    <i data-lucide="send" style="width:1rem;height:1rem;"></i> Kirim Data
+                </button>
+            </div>
+
+        </div><!-- end main-scroll -->
+    </div><!-- end main-area -->
+
+    <!-- Toast -->
+    <div id="toast" class="toast"><p id="toastMessage"></p></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyBzvOsp5EVnzTI8Kbew9nXSXXLpakBD6Ec",
+            authDomain: "ltq-hn.firebaseapp.com", projectId: "ltq-hn",
+            storageBucket: "ltq-hn.appspot.com", messagingSenderId: "542731528480",
+            appId: "1:542731528480:web:15203f68716ed2e3dacf45"
+        };
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app); const auth = getAuth(app);
+
+        let currentUserId = null, activeFormId = 'form1';
+        let unsubscribes = [], allMentors = [], allStudents = [], allHalaqohGroups = [];
+
+        const dom = {
+            forms: { form1: document.getElementById('form1'), form2: document.getElementById('form2'), form3: document.getElementById('form3') },
+            btn1: document.getElementById('showForm1Btn'), btn2: document.getElementById('showForm2Btn'), btn3: document.getElementById('showForm3Btn'),
+            submitBtn: document.getElementById('submitBtn'), resetBtn: document.getElementById('resetBtn'),
+            headerTitle: document.getElementById('headerTitle'),
+            headerSubtitle: document.getElementById('headerSubtitle'),
+            headerIconContainer: document.getElementById('headerIconContainer'),
+            headerIconBox: document.getElementById('headerIconBox'),
+            selects: {
+                namaPembimbing1: document.getElementById('namaPembimbing1'), namaSantri1: document.getElementById('namaSantri1'),
+                namaPembimbing2: document.getElementById('namaPembimbing2'), namaSantri2: document.getElementById('namaSantri2'),
+                namaPembimbingMenyimak: document.getElementById('namaPembimbingMenyimak'),
+                namaPembimbingHalaqoh: document.getElementById('namaPembimbingHalaqoh'), namaSantri3: document.getElementById('namaSantri3'),
+            },
+            toast: document.getElementById('toast'), toastMsg: document.getElementById('toastMessage'),
+        };
+
+        const formMeta = {
+            form1: { title: 'Perkembangan Santri', subtitle: 'Isi data hafalan dan nilai perkembangan santri.', icon: 'user-check', color: '#2563eb' },
+            form2: { title: 'Tasmi\' Hafalan', subtitle: 'Catat hasil tasmi\' hafalan Al-Quran santri.', icon: 'book-audio', color: '#6366f1' },
+            form3: { title: 'Absen Halaqoh', subtitle: 'Input data kehadiran santri dalam halaqoh.', icon: 'users', color: '#10b981' },
+        };
+
+        const showToast = (msg, isError = false) => {
+            dom.toastMsg.textContent = msg;
+            dom.toast.className = `toast ${isError ? 'bg-red-600' : 'bg-green-600'}`;
+            dom.toast.classList.add('show');
+            setTimeout(() => dom.toast.classList.remove('show'), 3000);
+        };
+
+        const ACTIVE_STYLE = 'linear-gradient(135deg, rgba(59,130,246,0.25), rgba(29,78,216,0.15))';
+        const switchForm = (formId) => {
+            activeFormId = formId;
+            Object.values(dom.forms).forEach(f => { f.classList.add('hidden'); f.style.display = ''; });
+            [dom.btn1, dom.btn2, dom.btn3].forEach(b => {
+                b.classList.remove('active'); b.style.background = ''; b.style.border = ''; b.style.color = '';
+            });
+            dom.forms[formId].classList.remove('hidden');
+            dom.forms[formId].style.display = 'flex';
+
+            // Update active sidebar state
+            const activeBtn = formId === 'form1' ? dom.btn1 : formId === 'form2' ? dom.btn2 : dom.btn3;
+            activeBtn.classList.add('active');
+            activeBtn.style.background = ACTIVE_STYLE;
+            activeBtn.style.border = '1px solid rgba(59,130,246,0.3)';
+            activeBtn.style.color = '#60a5fa';
+
+            // Update dynamic header
+            const meta = formMeta[formId];
+            dom.headerTitle.textContent = meta.title;
+            
+            // Reliable Lucide Icon Switch
+            dom.headerIconContainer.innerHTML = `<i data-lucide="${meta.icon}" style="width:2rem; height:2rem; color:white;"></i>`;
+            dom.headerIconBox.style.backgroundColor = meta.color;
+            lucide.createIcons();
+        };
+
+        const populateSelect = (el, items, placeholder, vk='id', tk='name') => {
+            if (!el) return; const cur = el.value;
+            el.innerHTML = `<option value="">${placeholder}</option>`;
+            items.sort((a,b)=>a[tk].localeCompare(b[tk])).forEach(i => {
+                const o = document.createElement('option'); o.value=i[vk]; o.textContent=i[tk]; el.appendChild(o);
+            }); el.value = cur;
+        };
+        const listen = (col, cb) => unsubscribes.push(onSnapshot(query(collection(db,'artifacts',appId,'public','data',col)), s=>cb(s.docs.map(d=>({id:d.id,...d.data()}))), e=>{console.error(e); showToast(`Gagal memuat ${col}.`,true);}));
+        const populateStudentsByMentor = (mentorId, n) => {
+            const el = dom.selects[`namaSantri${n}`]; if (!el) return;
+            if (!mentorId) { populateSelect(el,[],'Pilih pembimbing dulu','name','name'); return; }
+            const g = allHalaqohGroups.find(g=>g.mentorId===mentorId);
+            if (!g?.studentIds) { populateSelect(el,[],'Tidak ada santri di grup ini','name','name'); return; }
+            populateSelect(el, allStudents.filter(s=>g.studentIds.includes(s.id)),'Pilih Santri','name','name');
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUserId = user.uid;
+                unsubscribes.forEach(u=>u()); unsubscribes=[];
+                listen('students', items=>{allStudents=items;});
+                listen('halaqohGroups', items=>{allHalaqohGroups=items;});
+                listen('mentors', items=>{
+                    allMentors = items;
+                    populateSelect(dom.selects.namaPembimbing1, allMentors,'Pilih Pembimbing');
+                    populateSelect(dom.selects.namaPembimbing2, allMentors,'Pilih Pembimbing');
+                    populateSelect(dom.selects.namaPembimbingMenyimak, allMentors,'Pilih Pembimbing');
+                    populateSelect(dom.selects.namaPembimbingHalaqoh, allMentors,'Pilih Pembimbing');
+                });
+            } else {
+                try { await (initialAuthToken ? signInWithCustomToken(auth,initialAuthToken) : signInAnonymously(auth)); }
+                catch(e) { console.error(e); showToast("Error autentikasi: "+e.message,true); }
+            }
+        });
+
+        dom.btn1.addEventListener('click', ()=>switchForm('form1'));
+        dom.btn2.addEventListener('click', ()=>switchForm('form2'));
+        dom.btn3.addEventListener('click', ()=>switchForm('form3'));
+        dom.selects.namaPembimbing1.addEventListener('change', e=>populateStudentsByMentor(e.target.value,1));
+        dom.selects.namaPembimbing2.addEventListener('change', e=>populateStudentsByMentor(e.target.value,2));
+        dom.selects.namaPembimbingHalaqoh.addEventListener('change', e=>populateStudentsByMentor(e.target.value,3));
+
+        dom.resetBtn.addEventListener('click', () => {
+            dom.forms[activeFormId].reset();
+            populateSelect(dom.selects[`namaSantri${activeFormId.replace('form','')}`],[],'Pilih pembimbing dulu','name','name');
+            showToast('Formulir dibersihkan.');
+        });
+
+        dom.submitBtn.addEventListener('click', async () => {
+            if (!currentUserId) { showToast("Autentikasi diperlukan.",true); return; }
+            const form = dom.forms[activeFormId];
+            let isValid = true;
+            form.querySelectorAll('[required]').forEach(inp => {
+                if (inp.type==='radio') { if (![...form.querySelectorAll(`input[name="${inp.name}"]`)].some(r=>r.checked)) isValid=false; }
+                else if (!inp.value.trim()) isValid=false;
+            });
+            if (!isValid) { showToast("Mohon isi semua field yang wajib diisi.",true); return; }
+
+            const data = {formType: activeFormId, userId: currentUserId, timestamp: serverTimestamp()};
+            for (let [k,v] of new FormData(form).entries()) {
+                if (k.startsWith('namaPembimbing')) { const m=allMentors.find(m=>m.id===v); data[k]=m?m.name:''; }
+                else data[k]=v;
+            }
+            dom.submitBtn.disabled=true;
+            dom.submitBtn.innerHTML='<i data-lucide="loader" style="width:1rem;height:1rem;animation:spin 1s linear infinite;"></i> Mengirim...';
+            lucide.createIcons();
+            try {
+                await addDoc(collection(db,'artifacts',appId,'public','data','formSubmissions'), data);
+                showToast("Data berhasil dikirim!");
+                form.reset();
+                populateSelect(dom.selects[`namaSantri${activeFormId.replace('form','')}`],[],'Pilih pembimbing dulu','name','name');
+            } catch(e) { console.error(e); showToast("Gagal: "+e.message,true); }
+            finally {
+                dom.submitBtn.disabled=false;
+                dom.submitBtn.innerHTML='<i data-lucide="send" style="width:1rem;height:1rem;"></i> Kirim Data';
+                lucide.createIcons();
+            }
+        });
+
+        switchForm('form1');
+        lucide.createIcons();
+        window.addEventListener('beforeunload', ()=>unsubscribes.forEach(u=>u()));
+
+        // --- Mobile Sidebar Toggle ---
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const menuBtn = document.getElementById('mobileMenuBtn');
+
+        const openSidebar = () => { sidebar.classList.add('open'); overlay.classList.add('visible'); };
+        const closeSidebar = () => { sidebar.classList.remove('open'); overlay.classList.remove('visible'); };
+
+        menuBtn.addEventListener('click', openSidebar);
+        overlay.addEventListener('click', closeSidebar);
+
+        // Close sidebar when a form is selected on mobile
+        [dom.btn1, dom.btn2, dom.btn3].forEach(btn => btn.addEventListener('click', () => {
+            if (window.innerWidth <= 1024) closeSidebar();
+            // Also update mobile header title
+            document.getElementById('mobileHeaderTitle').textContent = dom.headerTitle.textContent;
+        }));
+    </script>
+</body>
+</html>

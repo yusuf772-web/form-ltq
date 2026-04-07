@@ -1,0 +1,125 @@
+/* ============================================
+   Panel Admin Pembimbing - Glassmorphism Theme
+   ============================================ */
+
+body { 
+    font-family: 'Inter', sans-serif;
+    background-color: #0f172a; 
+    background: radial-gradient(circle at top right, #1e293b, #0f172a);
+    background-attachment: fixed;
+    color: #e2e8f0; 
+}
+
+/* --- Modern Form Inputs --- */
+.form-input, .form-select, .form-checkbox {
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(71, 85, 105, 0.5);
+    color: #f8fafc;
+    border-radius: 0.75rem; 
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(8px);
+}
+
+.form-input, .form-select {
+    padding: 0.625rem 1rem; 
+    width: 100%;
+}
+
+.form-checkbox {
+    height: 1.25rem;
+    width: 1.25rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+.form-input:focus, .form-select:focus, .form-checkbox:focus {
+    outline: none; 
+    border-color: #3b82f6; 
+    background: rgba(30, 41, 59, 0.9);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.form-input::placeholder { color: #64748b; }
+
+/* --- Modern Cards --- */
+.card {
+    background: rgba(30, 41, 59, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 1.25rem; 
+    padding: 1.5rem;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.card:hover { border-color: rgba(59, 130, 246, 0.3); }
+
+/* --- Buttons --- */
+.btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+    padding: 0.625rem 1.25rem; border-radius: 0.75rem;
+    font-weight: 600; border: none; cursor: pointer; 
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-primary { 
+    background: linear-gradient(135deg, #3b82f6, #2563eb); 
+    color: white;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+}
+.btn-primary:hover:not(:disabled) { 
+    background: linear-gradient(135deg, #2563eb, #1d4ed8); 
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+}
+.btn-primary:disabled { 
+    background: rgba(51, 65, 85, 0.5);
+    color: #94a3b8;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+.btn-secondary { 
+    background: rgba(51, 65, 85, 0.5); 
+    color: #cbd5e1; 
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    backdrop-filter: blur(8px);
+}
+.btn-secondary:hover { background: rgba(71, 85, 105, 0.7); transform: translateY(-2px); }
+
+/* --- Toasts --- */
+.toast {
+    position: fixed;
+    top: 1.25rem;
+    right: 1.25rem;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+    transform: translateX(120%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 100;
+}
+.toast.bg-green-600 { background: linear-gradient(135deg, #10b981, #059669); }
+.toast.bg-red-600 { background: linear-gradient(135deg, #ef4444, #dc2626); }
+.toast.show { transform: translateX(0); }
+
+/* Scrollbar Setup */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(71, 85, 105, 0.6); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.9); }
+
+/* --- Table Specifics --- */
+.rekap-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; border-radius: 0.75rem; overflow: hidden; background: rgba(15, 23, 42, 0.3); }
+.rekap-table th, .rekap-table td { padding: 0.625rem 1rem; border: 1px solid rgba(148, 163, 184, 0.2); text-align: center; white-space: nowrap; vertical-align: middle; }
+.rekap-table th { background: rgba(51, 65, 85, 0.5); font-weight: 600; color: #f1f5f9; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.rekap-table .mentor-name { text-align: left; position: sticky; left: 0; background: rgba(30, 41, 59, 1); z-index: 10; border-right: 1px solid rgba(148, 163, 184, 0.3); }
+.rekap-table .waktu { position: sticky; left: 150px; background: rgba(30, 41, 59, 1); z-index: 10; border-right: 2px solid rgba(148, 163, 184, 0.4); }
+.rekap-table .holiday-cell { background-color: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+.attendance-cell { cursor: pointer; transition: background-color 0.2s; }
+.attendance-cell:not(.holiday-cell):hover { background-color: rgba(255,255,255,0.05); }
+.rekap-table tr:hover { background: rgba(255,255,255,0.03); }

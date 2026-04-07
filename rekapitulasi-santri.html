@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rekapitulasi Santri - LTQ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <style>
+        body { 
+            overflow: hidden; 
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; 
+        }
+        
+        .main-scroll { 
+            padding: 2rem; 
+            overflow-y: auto; 
+            height: 100vh; 
+            background: radial-gradient(circle at top right, #1e293b, #0f172a);
+            color: #e2e8f0; 
+        }
+
+        /* --- Modern Form Inputs --- */
+        .form-input, .form-select {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(71, 85, 105, 0.5);
+            color: #f8fafc;
+            border-radius: 0.75rem; 
+            padding: 0.625rem 1rem; 
+            width: 100%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(8px);
+        }
+        
+        .form-input:focus, .form-select:focus {
+            outline: none; 
+            border-color: #3b82f6; 
+            background: rgba(30, 41, 59, 0.9);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .form-input::placeholder { color: #64748b; }
+
+        /* --- Modern Cards --- */
+        .card {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 1.25rem; 
+            padding: 1.5rem;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transition: border-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.625rem 1.25rem; border-radius: 0.75rem;
+            font-weight: 600; border: none; cursor: pointer; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .btn-primary { 
+            background: linear-gradient(135deg, #3b82f6, #2563eb); 
+            color: white;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+        }
+        .btn-primary:hover:not(:disabled) { 
+            background: linear-gradient(135deg, #2563eb, #1d4ed8); 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+        }
+        .btn-primary:disabled { background: #334155; opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+        
+        .btn-secondary { 
+            background: rgba(51, 65, 85, 0.5); 
+            color: #cbd5e1; 
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            backdrop-filter: blur(8px);
+        }
+        .btn-secondary:hover { background: rgba(71, 85, 105, 0.7); transform: translateY(-2px); }
+
+        .tab-btn {
+            padding: 0.5rem 1rem; border-radius: 0.625rem;
+            font-weight: 500; color: #9ca3af; transition: all 0.2s;
+            flex-grow: 1; text-align: center; cursor: pointer;
+        }
+        .tab-btn:hover { color: #f9fafb; background: rgba(255,255,255,0.05); }
+        .tab-btn.active { 
+            background: linear-gradient(135deg, #3b82f6, #2563eb); 
+            color: white; 
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        /* --- Table --- */
+        .table-wrapper { overflow-x: auto; border-radius: 0.75rem; background: rgba(15, 23, 42, 0.3); }
+        .rekap-table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+        .rekap-table th { 
+            padding: 1rem; text-align: left; background: rgba(51, 65, 85, 0.5); 
+            font-weight: 600; color: #f1f5f9; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .rekap-table td { padding: 1rem; border-bottom: 1px solid rgba(71, 85, 105, 0.2); color: #e2e8f0; }
+        .rekap-table tr:hover { background: rgba(255,255,255,0.03); }
+
+        .skeleton { background: rgba(71, 85, 105, 0.3); border-radius: 0.5rem; animation: pulse 2s infinite; }
+        @keyframes pulse { 50% { opacity: .5; } }
+
+        /* --- Iframe Specific --- */
+        body.is-iframe .sidebar { display: none !important; }
+        body.is-iframe .main-area { width: 100% !important; margin-left: 0 !important; }
+        body.is-iframe .mobile-topbar { display: none !important; }
+        body.is-iframe .main-scroll { padding-top: 2rem !important; }
+
+        @media (max-width: 1024px) {
+            .main-scroll { padding: 1.25rem; }
+            .card { padding: 1rem; }
+        }
+
+        /* Filter buttons group style */
+        .filter-btn {
+            border-radius: 0.75rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #94a3b8;
+            transition: all 0.2s;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+        }
+        .filter-btn.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+        }
+
+        .class-filter-btn {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.75rem;
+            border-radius: 0.5rem;
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(71, 85, 105, 0.2);
+            color: #94a3b8;
+            transition: all 0.2s;
+        }
+        .class-filter-btn.active {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+    </style>
+    <script>
+        // Check if in iframe early
+        if (window.self !== window.top) {
+            document.documentElement.classList.add('is-iframe');
+            window.addEventListener('DOMContentLoaded', () => document.body.classList.add('is-iframe'));
+        }
+    </script>
+</head>
+<body>
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-brand-icon">
+                <i data-lucide="shield-check" class="text-white w-6 h-6"></i>
+            </div>
+            <div>
+                <div class="sidebar-title">Admin LTQ</div>
+                <div class="sidebar-subtitle">Panel Pengelolaan Data</div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="sidebar-section-label">Main Menu</div>
+            <a href="dashboard-ltq.html" class="sidebar-link">
+                <i data-lucide="layout-dashboard" class="sidebar-link-icon"></i> Dashboard
+            </a>
+            <a href="panel-admin-santri.html" class="sidebar-link">
+                <i data-lucide="settings-2" class="sidebar-link-icon"></i> Seting Halaqoh
+            </a>
+            <a href="rekapitulasi-santri.html" class="sidebar-link active" style="background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); color: #60a5fa;">
+                <i data-lucide="file-spreadsheet" class="sidebar-link-icon"></i> Rekapitulasi
+            </a>
+            <a href="index.html" class="sidebar-link">
+                <i data-lucide="form-input" class="sidebar-link-icon"></i> Formulir
+            </a>
+        </nav>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ===== MAIN AREA ===== -->
+    <div class="main-area flex-1">
+        
+        <!-- Mobile Topbar -->
+        <div class="mobile-topbar flex items-center justify-between p-4 bg-[#1e293b] border-b border-[#1e3a5f] lg:hidden">
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i data-lucide="menu" class="w-6 h-6 text-gray-400"></i>
+            </button>
+            <h1 class="text-white font-bold">Rekapitulasi</h1>
+            <div class="w-6"></div>
+        </div>
+
+        <div class="main-scroll">
+            
+            <!-- Page Header -->
+            <header class="flex flex-col sm:flex-row justify-between sm:items-start mb-8 gap-4">
+                <div>
+                    <h1 class="text-3xl font-extrabold text-white mb-2">Rekapitulasi Santri</h1>
+                    <p class="text-gray-400">Lihat, pantau, dan ekspor data rekapitulasi santri secara periodik.</p>
+                </div>
+                <button id="exportBtn" class="btn btn-primary" disabled>
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    <span>Ekspor ke Excel</span>
+                </button>
+            </header>
+
+            <main class="space-y-6">
+                
+                <!-- Filters Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="card lg:col-span-1">
+                        <label class="block text-sm font-medium text-gray-400 mb-4">Metode Filter</label>
+                        <div id="filterTypeContainer" class="flex gap-2 p-1 bg-slate-900/50 rounded-xl">
+                            <button data-value="month" class="filter-btn active flex-1">Per Bulan</button>
+                            <button data-value="range" class="filter-btn flex-1">Rentang</button>
+                        </div>
+                    </div>
+
+                    <div class="card lg:col-span-2">
+                        <label id="dateFilterLabel" class="block text-sm font-medium text-gray-400 mb-4">Pilih Periode</label>
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <select id="monthFilter" class="form-select flex-1"></select>
+                            <input type="date" id="startDateFilter" class="form-input flex-1 hidden">
+                            <input type="date" id="endDateFilter" class="form-input flex-1 hidden">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs Section -->
+                <div class="card">
+                    <div class="flex flex-col gap-6">
+                        <div class="flex">
+                            <div id="recapFilterContainer" class="flex bg-slate-900/50 p-1 rounded-xl gap-1 w-full sm:w-auto">
+                                <button data-recap="perkembangan" class="tab-btn active text-xs">Perkembangan</button>
+                                <button data-recap="tasmi" class="tab-btn text-xs">Tasmi'</button>
+                                <button data-recap="absen" class="tab-btn text-xs">Absen</button>
+                                <button data-recap="nilai" class="tab-btn text-xs">Nilai</button>
+                            </div>
+                        </div>
+                        <div id="classFilterContainer" class="flex flex-wrap items-center gap-2">
+                            <p class="text-xs text-slate-500 mr-1">Filter Kelas:</p>
+                            <!-- JS injected -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Table Section -->
+                <div class="card p-0">
+                    <div class="p-6">
+                        <div id="rekapLoader" class="hidden py-12">
+                            <div class="space-y-3">
+                                <div class="h-12 skeleton w-full"></div>
+                                <div class="h-12 skeleton w-full"></div>
+                                <div class="h-12 skeleton w-full"></div>
+                            </div>
+                        </div>
+                        <div class="table-wrapper">
+                            <table id="rekapTable" class="rekap-table hidden">
+                                <thead id="rekapTableHead"></thead>
+                                <tbody id="rekapTableBody"></tbody>
+                            </table>
+                        </div>
+                        
+                        <div id="emptyState" class="py-20 text-center">
+                            <div class="inline-flex p-4 rounded-full bg-slate-800/50 mb-4">
+                                <i data-lucide="database" class="w-8 h-8 text-slate-600"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-white">Belum Ada Data</h3>
+                            <p class="text-slate-500 max-w-xs mx-auto text-sm mt-1">Silakan pilih kelas dan periode filter untuk menampilkan laporan.</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="js/rekapitulasi-santri.js" type="module"></script>
+    <script>
+        // Sidebar logic
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', () => {
+                sidebar.style.transform = 'translateX(0)';
+                sidebarOverlay.style.display = 'block';
+            });
+        }
+
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', () => {
+                sidebar.style.transform = '';
+                sidebarOverlay.style.display = 'none';
+            });
+        }
+
+        // Lucide
+        lucide.createIcons();
+    </script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+/* ============================================
+   Formulir Perkembangan LTQ - Stylesheet
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #111827;
+    color: #d1d5db;
+}
+
+/* --- Layout --- */
+.page-layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 1.5rem;
+    align-items: start;
+    min-height: calc(100vh - 4rem);
+}
+
+@media (max-width: 768px) {
+    .page-layout {
+        grid-template-columns: 1fr;
+    }
+    .sidebar-nav { flex-direction: row; overflow-x: auto; }
+    .nav-btn { flex-shrink: 0; }
+}
+
+/* --- Sidebar --- */
+.sidebar-card {
+    background-color: #1f2937;
+    border: 1px solid #374151;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    position: sticky;
+    top: 1.5rem;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    color: #9ca3af;
+    transition: all 0.2s;
+    text-align: left;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+}
+.nav-btn:hover {
+    background-color: #374151;
+    color: #f9fafb;
+}
+.nav-btn.active {
+    background-color: #2563eb;
+    color: white;
+}
+.nav-btn .nav-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+}
+.nav-divider {
+    border: none;
+    border-top: 1px solid #374151;
+    margin: 0.5rem 0;
+}
+
+/* --- Card --- */
+.card {
+    background-color: #1f2937;
+    border: 1px solid #374151;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    padding: 1.5rem;
+}
+
+/* --- Form Elements --- */
+.required::after {
+    content: " *";
+    color: #f87171;
+}
+
+.form-input, .form-select {
+    background-color: #374151;
+    border: 1px solid #4b5563;
+    color: #f9fafb;
+    border-radius: 0.5rem;
+    padding: 0.625rem 1rem;
+    width: 100%;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-input:focus, .form-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+}
+.form-input::placeholder { color: #9ca3af; }
+
+.form-radio {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid #4b5563;
+    border-radius: 50%;
+    display: inline-block;
+    vertical-align: middle;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.form-radio:checked { border-color: #3b82f6; }
+.form-radio:checked::after {
+    content: '';
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background-color: #3b82f6;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* --- Buttons --- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+.btn-primary { background-color: #3b82f6; color: white; }
+.btn-primary:hover:not(:disabled) { background-color: #2563eb; }
+.btn-primary:disabled { background-color: #374151; cursor: not-allowed; opacity: 0.7; }
+.btn-secondary { background-color: #374151; color: #d1d5db; }
+.btn-secondary:hover { background-color: #4b5563; }
+
+/* --- Toast --- */
+.toast {
+    position: fixed;
+    bottom: 1.25rem;
+    right: 1.25rem;
+    color: white;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    transform: translateY(5rem);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    z-index: 100;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+.hidden { display: none; }
