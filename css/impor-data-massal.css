@@ -1,68 +1,93 @@
+@import url('glass-ui.css');
+
 /* ============================================
-   Impor Data Massal - Stylesheet
+   Import Data Massal - Page Specific Styles
    ============================================ */
 
-body {
-    font-family: 'Inter', sans-serif;
-    background-color: #111827;
-    color: #d1d5db;
-}
-
-.card {
-    background-color: #1f2937;
-    border: 1px solid #374151;
-    border-radius: 0.75rem;
-    padding: 1.5rem;
-}
-
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.625rem 1rem;
-    border-radius: 0.5rem;
-    font-weight: 600;
-    transition: all 0.2s ease-in-out;
-    cursor: pointer;
-    border: 1px solid transparent;
-}
-.btn-primary {
-    background-color: #3b82f6;
-    color: white;
-}
-.btn-primary:hover:not(:disabled) {
-    background-color: #2563eb;
-}
-.btn-primary:disabled {
-    background-color: #374151;
-    cursor: not-allowed;
-    opacity: 0.7;
-}
-.btn-secondary {
-    background-color: #4b5563;
-    color: white;
-}
-.btn-secondary:hover {
-    background-color: #6b7280;
-}
-
-.file-input-label {
-    border: 2px dashed #4b5563;
+.upload-zone {
+    border: 2px dashed rgba(59, 130, 246, 0.3);
+    background: rgba(15, 23, 42, 0.4);
+    border-radius: 1.5rem;
+    padding: 3rem;
     text-align: center;
-    border-radius: 0.5rem;
+    transition: all 0.3s ease;
     cursor: pointer;
-    transition: all 0.2s;
+    position: relative;
+}
+
+.upload-zone:hover, .upload-zone.dragover {
+    border-color: var(--accent-blue);
+    background: rgba(59, 130, 246, 0.05);
+    transform: translateY(-2px);
+}
+
+.upload-icon {
+    width: 64px;
+    height: 64px;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 1.25rem;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
     align-items: center;
-    flex-grow: 1;
+    justify-content: center;
+    color: var(--accent-blue);
+    margin: 0 auto 1.5rem;
 }
-.file-input-label:hover {
-    border-color: #3b82f6;
-    background-color: #273142;
+
+.template-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--glass-border);
+    border-radius: 1rem;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
 }
-.file-input-label.has-file {
-    border-color: #22c55e;
-    background-color: #163326;
+
+.template-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(59, 130, 246, 0.2);
 }
+
+.template-icon {
+    width: 44px;
+    height: 44px;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-blue);
+}
+
+.progress-bar-container {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 1rem 0;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-blue), #1d4ed8);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.import-log {
+    background: #020617;
+    border: 1px solid var(--glass-border);
+    border-radius: 1rem;
+    padding: 1rem;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.75rem;
+    color: #94a3b8;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.log-entry { margin-bottom: 0.25rem; }
+.log-entry.success { color: #10b981; }
+.log-entry.error { color: #ef4444; }
+.log-entry.info { color: #3b82f6; }

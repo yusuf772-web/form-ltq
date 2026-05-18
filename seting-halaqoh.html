@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seting Halaqoh - Admin LTQ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/seting-halaqoh.css">
+    <script>
+        if (window.self !== window.top) {
+            document.documentElement.classList.add('is-iframe');
+            window.addEventListener('DOMContentLoaded', () => document.body.classList.add('is-iframe'));
+        }
+    </script>
+</head>
+
+<body>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="page-header">
+            <div class="header-icon">
+                <i data-lucide="settings-2" class="w-10 h-10 text-white"></i>
+            </div>
+            <div class="flex-1">
+                <h1 class="text-4xl font-extrabold tracking-tight text-white">Seting Halaqoh</h1>
+                <p class="text-gray-400 text-lg">Kelola master data pembimbing, santri, kelas, dan grup halaqoh.</p>
+            </div>
+        </header>
+
+        <main class="w-full">
+            <div class="glass-card p-6 min-h-[600px] flex flex-col">
+                <!-- Navigation Tabs -->
+                <div class="tab-nav">
+                    <button id="showHalaqohGroupsTabBtn" class="active">Grup Halaqoh</button>
+                    <button id="showMentorsTabBtn">Pembimbing</button>
+                    <button id="showStudentsTabBtn">Santri</button>
+                    <button id="showClassesTabBtn">Kelas</button>
+                </div>
+
+                <!-- Filters & Actions -->
+                <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                    <div class="relative flex-1">
+                        <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"></i>
+                        <input type="text" id="groupSearchInput" placeholder="Cari data..." class="input-glass pl-10">
+                    </div>
+                    <select id="studentListClassFilter" class="input-glass w-full sm:w-48 hidden">
+                        <option value="">Semua Kelas</option>
+                    </select>
+                    <div class="flex gap-2">
+                        <button id="bulkDeleteBtn" class="premium-btn !bg-red-600 !w-auto px-6 hidden">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i> Hapus (<span id="bulkDeleteCount">0</span>)
+                        </button>
+                        <button id="addMainEntityBtn" class="premium-btn !w-auto px-6">
+                            <i data-lucide="plus" class="w-4 h-4"></i> Tambah
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Content List -->
+                <div id="managementTabContent" class="flex-1 list-container">
+                    <!-- Dynamic content will be injected here -->
+                    <div id="entityList" class="space-y-3"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="entityModal" class="modal-overlay">
+        <div class="glass-card p-8 modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="entityModalTitle" class="text-2xl font-bold text-white">Tambah Data</h3>
+                <button class="icon-btn close-modal"><i data-lucide="x"></i></button>
+            </div>
+            <div id="entityModalFields" class="space-y-4"></div>
+            <div class="flex gap-3 mt-8">
+                <button id="cancelEntityBtn" class="btn-secondary-glass flex-1">Batal</button>
+                <button id="saveEntityBtn" class="premium-btn flex-1">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteModal" class="modal-overlay">
+        <div class="glass-card p-8 modal-content max-w-sm text-center">
+            <div class="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500">
+                <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">Hapus Data?</h3>
+            <p class="text-gray-400 mb-6">Tindakan ini permanen dan tidak dapat dibatalkan.</p>
+            <div class="flex gap-3">
+                <button id="cancelDeleteBtn" class="btn-secondary-glass flex-1">Batal</button>
+                <button id="confirmDeleteBtn" class="premium-btn !bg-red-600 flex-1">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="manageStudentsModal" class="modal-overlay">
+        <div class="glass-card p-8 modal-content !max-w-4xl">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="manageStudentsModalTitle" class="text-2xl font-bold text-white">Kelola Anggota</h3>
+                <button class="icon-btn close-modal"><i data-lucide="x"></i></button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <input type="text" id="modalStudentSearch" placeholder="Cari santri..." class="input-glass">
+                <select id="modalClassFilter" class="input-glass">
+                    <option value="">Semua Kelas</option>
+                </select>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="text-xs font-bold text-gray-500 uppercase mb-3">Tersedia</h4>
+                    <div id="allStudentsListForModal" class="bg-slate-950/50 rounded-xl p-2 h-[400px] overflow-y-auto space-y-1"></div>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold text-blue-400 uppercase mb-3">Anggota Saat Ini</h4>
+                    <div id="groupStudentsListForModal" class="bg-blue-500/5 border border-blue-500/20 rounded-xl p-2 h-[400px] overflow-y-auto space-y-1"></div>
+                </div>
+            </div>
+            <div class="mt-8">
+                <button id="closeManageStudentsBtn" class="premium-btn">Selesai</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast">
+        <p id="toastMessage"></p>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="js/seting-halaqoh.js"></script>
+    <script>
+        lucide.createIcons();
+        
+        // Modal helpers
+        const showModal = (id) => document.getElementById(id).classList.add('show');
+        const hideModal = (id) => document.getElementById(id).classList.remove('show');
+        
+        document.querySelectorAll('.close-modal').forEach(btn => {
+            btn.onclick = () => btn.closest('.modal-overlay').classList.remove('show');
+        });
+    </script>
+</body>
+
+</html>

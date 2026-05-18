@@ -1,17 +1,12 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getFirestore, collection, onSnapshot, doc, setDoc, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
 // --- PWA Setup ---
 function setupPWA() {
-    // 1. Generate manifest.json dynamically
     const manifest = {
         "name": "Absensi Pembimbing",
         "short_name": "Absen",
         "start_url": ".",
         "display": "standalone",
-        "background_color": "#111827",
-        "theme_color": "#3b82f6",
+        "background_color": "#020617",
+        "theme_color": "#020617",
         "description": "Aplikasi untuk mencatat absensi pembimbing.",
         "icons": [
             { "src": "https://placehold.co/192x192/3b82f6/ffffff?text=Absen", "type": "image/png", "sizes": "192x192" },
@@ -20,27 +15,28 @@ function setupPWA() {
     };
     const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
     const manifestURL = URL.createObjectURL(manifestBlob);
-    document.querySelector('#manifest').setAttribute('href', manifestURL);
+    const manifestEl = document.querySelector('#manifest');
+    if (manifestEl) manifestEl.setAttribute('href', manifestURL);
 
-    // 2. Handle "Add to Home Screen" prompt
     let deferredPrompt;
     const installBtn = document.getElementById('installAppBtn');
 
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        installBtn.classList.remove('hidden');
+        if (installBtn) installBtn.classList.remove('hidden');
     });
 
-    installBtn.addEventListener('click', async () => {
-        installBtn.classList.add('hidden');
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            console.log(`User response to the install prompt: ${outcome}`);
-            deferredPrompt = null;
-        }
-    });
+    if (installBtn) {
+        installBtn.addEventListener('click', async () => {
+            installBtn.classList.add('hidden');
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                deferredPrompt = null;
+            }
+        });
+    }
 }
 
 // --- Firebase Configuration ---
@@ -56,9 +52,10 @@ const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__f
 const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
 // --- Initialize Firebase ---
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const auth = firebase.auth();
+const Timestamp = firebase.firestore.Timestamp;
 
 // --- Global State ---
 let allMentors = [];
@@ -73,23 +70,28 @@ const dom = {
     saveAttendanceBtn: document.getElementById('saveAttendanceBtn'),
     mentorSearchInput: document.getElementById('mentorSearchInput'),
     mentorSearchEmpty: document.getElementById('mentorSearchEmpty'),
+    statTotal: document.getElementById('statTotal'),
+    statPresent: document.getElementById('statPresent'),
+    statAbsent: document.getElementById('statAbsent'),
 };
 
 // --- Authentication ---
-onAuthStateChanged(auth, async (user) => {
+auth.onAuthStateChanged(async (user) => {
     if (user) {
         currentUserId = user.uid;
         fetchInitialData();
     } else {
-        try { await (initialAuthToken ? signInWithCustomToken(auth, initialAuthToken) : signInAnonymously(auth)); }
-        catch (error) { console.error("Authentication error:", error); }
+        try { 
+            if (initialAuthToken) await auth.signInWithCustomToken(initialAuthToken);
+            else await auth.signInAnonymously();
+        } catch (error) { console.error("Authentication error:", error); }
     }
 });
 
 // --- Data Fetching ---
 async function fetchInitialData() {
-    const mentorsCollection = collection(db, 'artifacts', appId, 'public', 'data', 'mentors');
-    unsubscribes.mentors = onSnapshot(mentorsCollection, (snapshot) => {
+    const mentorsCollection = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('mentors');
+    unsubscribes.mentors = mentorsCollection.onSnapshot((snapshot) => {
         allMentors = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderMentorAttendanceList();
     });
@@ -98,40 +100,84 @@ async function fetchInitialData() {
 // --- UI Rendering ---
 function renderMentorAttendanceList() {
     const container = dom.attendanceMentorList;
+    if (!container) return;
     container.innerHTML = '';
+    
     if (allMentors.length > 0) {
         const sortedMentors = [...allMentors].sort((a, b) => a.name.localeCompare(b.name));
         sortedMentors.forEach(mentor => {
-            const label = document.createElement('label');
-            label.className = 'mentor-item flex items-center gap-3 p-2 rounded-md hover:bg-gray-700/50 cursor-pointer transition-colors';
-            label.dataset.mentorName = mentor.name.toLowerCase();
-            label.innerHTML = `
-                <input type="checkbox" data-mentor-name="${mentor.name}" class="form-checkbox absent-checkbox w-4 h-4 flex-shrink-0">
-                <span class="text-gray-300">${mentor.name}</span>
+            const div = document.createElement('div');
+            div.className = 'mentor-row group';
+            div.dataset.mentorName = mentor.name.toLowerCase();
+            
+            div.innerHTML = `
+                <div class="flex items-center gap-4">
+                    <div class="mentor-avatar">
+                        ${mentor.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                        <span class="block text-white font-semibold leading-none mb-1">${mentor.name}</span>
+                        <span class="text-[10px] text-gray-500 uppercase tracking-tight">Pembimbing</span>
+                    </div>
+                </div>
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" data-mentor-id="${mentor.id}" data-mentor-name="${mentor.name}" class="attendance-checkbox">
+                    <span class="checkmark"></span>
+                </label>
             `;
-            container.appendChild(label);
+
+            // Click row to toggle checkbox
+            div.onclick = (e) => {
+                if (e.target.tagName !== 'INPUT') {
+                    const cb = div.querySelector('input');
+                    cb.checked = !cb.checked;
+                    cb.dispatchEvent(new Event('change'));
+                }
+            };
+
+            const checkbox = div.querySelector('input');
+            checkbox.onchange = () => {
+                div.classList.toggle('is-absent', checkbox.checked);
+                updateStats();
+            };
+
+            container.appendChild(div);
         });
-        // Apply any active search after re-render
+
         filterMentorList(dom.mentorSearchInput.value);
+        updateStats();
+        if (window.lucide) lucide.createIcons();
     } else {
-        container.innerHTML = '<p class="text-gray-500 text-center py-4">Memuat data pembimbing...</p>';
+        container.innerHTML = '<div class="text-center py-12 text-gray-500 animate-pulse">Memuat data pembimbing...</div>';
     }
+}
+
+function updateStats() {
+    const total = allMentors.length;
+    const checkboxes = dom.attendanceMentorList.querySelectorAll('.attendance-checkbox');
+    const absentCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+    const presentCount = total - absentCount;
+
+    if (dom.statTotal) dom.statTotal.textContent = total;
+    if (dom.statPresent) dom.statPresent.textContent = presentCount;
+    if (dom.statAbsent) dom.statAbsent.textContent = absentCount;
 }
 
 // --- Search / Filter Logic ---
 function filterMentorList(query) {
     const keyword = query.toLowerCase().trim();
-    const items = dom.attendanceMentorList.querySelectorAll('.mentor-item');
+    const items = dom.attendanceMentorList?.querySelectorAll('.mentor-row');
+    if (!items) return;
     let visibleCount = 0;
 
     items.forEach(item => {
         const name = item.dataset.mentorName || '';
         const match = name.includes(keyword);
-        item.style.display = match ? '' : 'none';
+        item.style.display = match ? 'flex' : 'none';
         if (match) visibleCount++;
     });
 
-    dom.mentorSearchEmpty.classList.toggle('hidden', visibleCount > 0 || items.length === 0);
+    if (dom.mentorSearchEmpty) dom.mentorSearchEmpty.classList.toggle('hidden', visibleCount > 0 || items.length === 0);
 }
 
 // --- Core Logic ---
@@ -143,27 +189,36 @@ async function handleSaveAttendance(e) {
     const session = sessionInput.value;
 
     const button = dom.saveAttendanceBtn;
+    const originalContent = button.innerHTML;
     button.disabled = true;
-    button.innerHTML = `<span>Menyimpan...</span>`;
+    button.innerHTML = `<span class="flex items-center gap-2"><i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Menyimpan...</span>`;
+    lucide.createIcons();
 
-    const absentMentors = Array.from(dom.attendanceMentorList.querySelectorAll('.absent-checkbox:checked')).map(cb => cb.dataset.mentorName);
-    const presentMentors = allMentors.map(m => m.name).filter(name => !absentMentors.includes(name));
+    const presentMentors = [];
+    const absentMentors = [];
+
+    dom.attendanceMentorList.querySelectorAll('.attendance-checkbox').forEach(cb => {
+        const name = cb.dataset.mentorName;
+        if (cb.checked) absentMentors.push(name);
+        else presentMentors.push(name);
+    });
+
     const docId = `${date}_${session}`;
-    const attendanceDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'dailyAttendance', docId);
+    const attendanceDocRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('dailyAttendance').doc(docId);
     const dataToSave = { date, session, absentMentors, presentMentors, timestamp: Timestamp.now(), recordedBy: currentUserId };
 
     try {
-        await setDoc(attendanceDocRef, dataToSave);
-        showToast("Absensi berhasil disimpan.");
-        dom.attendanceForm.reset();
-        dom.attendanceDate.value = new Date().toISOString().split('T')[0];
+        await attendanceDocRef.set(dataToSave);
+        showToast("Absensi berhasil disimpan!");
+        // We don't reset the date, but we can clear the search
+        if (dom.mentorSearchInput) dom.mentorSearchInput.value = '';
         renderMentorAttendanceList();
     } catch (error) {
         console.error("Save Error: ", error);
         showToast("Gagal menyimpan absensi.", true);
     } finally {
         button.disabled = false;
-        button.innerHTML = `<i data-lucide="save" class="w-4 h-4 mr-2"></i><span>Simpan Absensi</span>`;
+        button.innerHTML = originalContent;
         lucide.createIcons();
     }
 }
@@ -174,26 +229,23 @@ function showToast(message, isError = false) {
     const toastMessage = document.getElementById('toastMessage');
     if (!toast || !toastMessage) return;
     toastMessage.textContent = message;
-    toast.className = `toast ${isError ? 'bg-red-600' : 'bg-green-600'}`;
+    toast.classList.remove('success', 'error');
+    toast.classList.add(isError ? 'error' : 'success');
     toast.classList.add('show');
     setTimeout(() => { toast.classList.remove('show'); }, 3000);
 }
 
 // --- Event Listeners ---
-dom.attendanceForm.addEventListener('submit', handleSaveAttendance);
-
-dom.mentorSearchInput.addEventListener('input', (e) => {
-    filterMentorList(e.target.value);
-});
+dom.attendanceForm?.addEventListener('submit', handleSaveAttendance);
+dom.mentorSearchInput?.addEventListener('input', (e) => { filterMentorList(e.target.value); });
 
 // --- Initial Setup ---
 function initializePage() {
-    dom.attendanceDate.value = new Date().toISOString().split('T')[0];
+    if (dom.attendanceDate) dom.attendanceDate.value = new Date().toISOString().split('T')[0];
     lucide.createIcons();
     setupPWA();
-    // Clear search on form reset
-    dom.attendanceForm.addEventListener('reset', () => {
-        dom.mentorSearchInput.value = '';
+    dom.attendanceForm?.addEventListener('reset', () => {
+        if (dom.mentorSearchInput) dom.mentorSearchInput.value = '';
         filterMentorList('');
     });
 }
@@ -202,3 +254,4 @@ initializePage();
 window.addEventListener('beforeunload', () => {
     Object.values(unsubscribes).forEach(unsub => unsub && unsub());
 });
+

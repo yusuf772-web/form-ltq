@@ -1,120 +1,134 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Impor Data Massal</title>
-    
-    <!-- Tailwind CSS -->
+    <title>Import Data Massal - Admin LTQ</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Papa Parse for CSV parsing -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/impor-data-massal.css">
+    <script>
+        if (window.self !== window.top) {
+            document.documentElement.classList.add('is-iframe');
+            window.addEventListener('DOMContentLoaded', () => document.body.classList.add('is-iframe'));
+        }
+    </script>
 </head>
-<body class="p-4 sm:p-6 lg:p-8">
 
-    <div class="w-full">
+<body>
+
+    <div class="app-container">
         <!-- Header -->
-        <header class="flex flex-col sm:flex-row justify-between sm:items-start mb-8 gap-4">
-            <div class="flex items-center gap-4">
-                <div class="bg-blue-600 p-3 rounded-xl">
-                    <i data-lucide="upload-cloud" class="w-8 h-8 text-white"></i>
-                </div>
-                <div>
-                    <h1 class="text-3xl font-bold text-white">Impor Data Massal</h1>
-                    <p class="text-gray-400">Unggah file CSV untuk mengimpor data secara massal.</p>
-                </div>
+        <header class="page-header">
+            <div class="header-icon">
+                <i data-lucide="upload-cloud" class="w-10 h-10 text-white"></i>
+            </div>
+            <div class="flex-1">
+                <h1 class="text-4xl font-extrabold tracking-tight text-white">Import Data Massal</h1>
+                <p class="text-gray-400 text-lg">Migrasi data santri dan master data dengan mudah via file Excel/CSV.</p>
             </div>
         </header>
 
-        <!-- Import Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- Impor Pembimbing -->
-            <div class="card flex flex-col">
-                <div class="flex justify-between items-start mb-4">
+            <div class="glass-card p-6 flex flex-col h-full">
+                <div class="flex justify-between items-start mb-6">
                     <div>
-                        <h2 class="text-xl font-semibold text-white">Impor Pembimbing</h2>
-                        <p class="text-gray-400 text-sm mt-1">Header: `name`</p>
+                        <h2 class="text-xl font-bold text-white">Impor Pembimbing</h2>
+                        <p class="text-gray-400 text-xs mt-1 uppercase tracking-wider">Header: `name`</p>
                     </div>
-                    <a href="data:text/csv;charset=utf-8,name%0AUstadz Fulan" download="template_pembimbing.csv" class="btn btn-secondary !px-3 !py-2 text-xs flex-shrink-0">
-                        <i data-lucide="download" class="w-4 h-4 mr-1"></i>Template
+                    <a href="data:text/csv;charset=utf-8,name%0AUstadz Fulan" download="template_pembimbing.csv" class="btn-secondary-glass !py-1.5 !px-3 text-xs">
+                        <i data-lucide="download" class="w-3 h-3 mr-1 inline"></i> Template
                     </a>
                 </div>
-                <form id="importMentorForm" class="flex flex-col flex-grow space-y-4">
-                    <label for="mentorFile" class="file-input-label">
-                        <i data-lucide="file-up" class="w-8 h-8 mx-auto text-gray-500"></i>
-                        <span id="mentorFileName" class="mt-2 block text-sm">Klik atau seret file CSV</span>
+                <form id="importMentorForm" class="flex flex-col flex-1 gap-4">
+                    <label for="mentorFile" class="upload-zone !p-6 flex-1 flex flex-col items-center justify-center">
+                        <i data-lucide="file-up" class="w-8 h-8 text-blue-400 mb-2"></i>
+                        <span id="mentorFileName" class="text-sm text-gray-400 text-center">Pilih file CSV</span>
+                        <input type="file" id="mentorFile" class="hidden" accept=".csv">
                     </label>
-                    <input type="file" id="mentorFile" class="hidden" accept=".csv">
-                    <button type="submit" class="btn btn-primary w-full mt-auto">
-                        <i data-lucide="upload" class="w-4 h-4 mr-2"></i>Impor Pembimbing
+                    <button type="submit" class="premium-btn">
+                        <i data-lucide="upload" class="w-4 h-4 mr-2"></i> Impor Data
                     </button>
                 </form>
             </div>
 
             <!-- Impor Kelas -->
-            <div class="card flex flex-col">
-                <div class="flex justify-between items-start mb-4">
+            <div class="glass-card p-6 flex flex-col h-full">
+                <div class="flex justify-between items-start mb-6">
                     <div>
-                        <h2 class="text-xl font-semibold text-white">Impor Kelas</h2>
-                        <p class="text-gray-400 text-sm mt-1">Header: `name`</p>
+                        <h2 class="text-xl font-bold text-white">Impor Kelas</h2>
+                        <p class="text-gray-400 text-xs mt-1 uppercase tracking-wider">Header: `name`</p>
                     </div>
-                    <a href="data:text/csv;charset=utf-8,name%0A1A" download="template_kelas.csv" class="btn btn-secondary !px-3 !py-2 text-xs flex-shrink-0">
-                        <i data-lucide="download" class="w-4 h-4 mr-1"></i>Template
+                    <a href="data:text/csv;charset=utf-8,name%0A1A" download="template_kelas.csv" class="btn-secondary-glass !py-1.5 !px-3 text-xs">
+                        <i data-lucide="download" class="w-3 h-3 mr-1 inline"></i> Template
                     </a>
                 </div>
-                <form id="importClassForm" class="flex flex-col flex-grow space-y-4">
-                     <label for="classFile" class="file-input-label">
-                        <i data-lucide="file-up" class="w-8 h-8 mx-auto text-gray-500"></i>
-                        <span id="className" class="mt-2 block text-sm">Klik atau seret file CSV</span>
+                <form id="importClassForm" class="flex flex-col flex-1 gap-4">
+                    <label for="classFile" class="upload-zone !p-6 flex-1 flex flex-col items-center justify-center">
+                        <i data-lucide="file-up" class="w-8 h-8 text-blue-400 mb-2"></i>
+                        <span id="className" class="text-sm text-gray-400 text-center">Pilih file CSV</span>
+                        <input type="file" id="classFile" class="hidden" accept=".csv">
                     </label>
-                    <input type="file" id="classFile" class="hidden" accept=".csv">
-                    <button type="submit" class="btn btn-primary w-full mt-auto">
-                        <i data-lucide="upload" class="w-4 h-4 mr-2"></i>Impor Kelas
+                    <button type="submit" class="premium-btn">
+                        <i data-lucide="upload" class="w-4 h-4 mr-2"></i> Impor Data
                     </button>
                 </form>
             </div>
 
             <!-- Impor Santri -->
-            <div class="card flex flex-col">
-                <div class="flex justify-between items-start mb-4">
+            <div class="glass-card p-6 flex flex-col h-full">
+                <div class="flex justify-between items-start mb-6">
                     <div>
-                        <h2 class="text-xl font-semibold text-white">Impor Santri</h2>
-                        <p class="text-gray-400 text-sm mt-1">Header: `name`, `class`</p>
+                        <h2 class="text-xl font-bold text-white">Impor Santri</h2>
+                        <p class="text-gray-400 text-xs mt-1 uppercase tracking-wider">Header: `name`, `class`</p>
                     </div>
-                    <a href="data:text/csv;charset=utf-8,name,class%0AAhmad,1A" download="template_santri.csv" class="btn btn-secondary !px-3 !py-2 text-xs flex-shrink-0">
-                        <i data-lucide="download" class="w-4 h-4 mr-1"></i>Template
+                    <a href="data:text/csv;charset=utf-8,name,class%0AAhmad,1A" download="template_santri.csv" class="btn-secondary-glass !py-1.5 !px-3 text-xs">
+                        <i data-lucide="download" class="w-3 h-3 mr-1 inline"></i> Template
                     </a>
                 </div>
-                <form id="importStudentForm" class="flex flex-col flex-grow space-y-4">
-                     <label for="studentFile" class="file-input-label">
-                        <i data-lucide="file-up" class="w-8 h-8 mx-auto text-gray-500"></i>
-                        <span id="studentFileName" class="mt-2 block text-sm">Klik atau seret file CSV</span>
+                <form id="importStudentForm" class="flex flex-col flex-1 gap-4">
+                    <label for="studentFile" class="upload-zone !p-6 flex-1 flex flex-col items-center justify-center">
+                        <i data-lucide="file-up" class="w-8 h-8 text-blue-400 mb-2"></i>
+                        <span id="studentFileName" class="text-sm text-gray-400 text-center">Pilih file CSV</span>
+                        <input type="file" id="studentFile" class="hidden" accept=".csv">
                     </label>
-                    <input type="file" id="studentFile" class="hidden" accept=".csv">
-                    <button type="submit" class="btn btn-primary w-full mt-auto">
-                        <i data-lucide="upload" class="w-4 h-4 mr-2"></i>Impor Santri
+                    <button type="submit" class="premium-btn">
+                        <i data-lucide="upload" class="w-4 h-4 mr-2"></i> Impor Data
                     </button>
                 </form>
             </div>
-        </div>
+        </main>
     </div>
-    
-    <!-- Toast Message -->
-    <div id="toast" class="fixed bottom-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300">
+
+    <div id="toast" class="toast">
         <p id="toastMessage"></p>
     </div>
 
-    <script type="module" src="js/impor-data-massal.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="js/impor-data-massal.js"></script>
+    <script>
+        lucide.createIcons();
+        
+        // File input listeners for UI updates
+        ['mentorFile', 'classFile', 'studentFile'].forEach(id => {
+            const input = document.getElementById(id);
+            const nameSpan = document.getElementById(id === 'classFile' ? 'className' : id + 'Name');
+            input.onchange = (e) => {
+                if (e.target.files.length) {
+                    nameSpan.textContent = e.target.files[0].name;
+                    nameSpan.classList.add('text-blue-400', 'font-bold');
+                }
+            };
+        });
+    </script>
 </body>
-</html>
+
+</html>

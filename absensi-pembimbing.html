@@ -1,21 +1,23 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Absensi Pembimbing</title>
-    
+    <title>Absensi Pembimbing | LTQ Hidayatunnajah</title>
+
     <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#3b82f6"/>
-    <link rel="apple-touch-icon" href="https://www.hidayatunnajah.or.id/wp-content/uploads/2025/07/WhatsApp-Image-2025-07-19-at-16.30.33.jpeg" onerror="this.onerror=null;this.src='https://placehold.co/180x180/1f2937/ffffff?text=Icon';">
+    <meta name="theme-color" content="#020617" />
+    <link rel="apple-touch-icon"
+        href="https://www.hidayatunnajah.or.id/wp-content/uploads/2025/07/WhatsApp-Image-2025-07-19-at-16.30.33.jpeg">
     <link rel="manifest" id="manifest">
 
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS (for utility layout) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    
+
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,67 +26,120 @@
     <!-- Custom Styles -->
     <link rel="stylesheet" href="css/absensi-pembimbing.css">
 </head>
-<body class="p-4 sm:p-6 lg:p-8">
 
-    <div class="w-full space-y-6">
+<body>
+
+    <div class="app-container">
+        <!-- Back Button -->
+        <a href="dashboard-ltq.html" class="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-6 group">
+            <i data-lucide="arrow-left" class="w-5 h-5 group-hover:-translate-x-1 transition-transform"></i>
+            <span class="font-medium">Kembali ke Dashboard</span>
+        </a>
+
         <!-- Header -->
-        <header class="flex items-center justify-between gap-4 mb-6">
-            <div class="flex items-center gap-4">
-                <div class="bg-blue-600 p-3 rounded-xl">
-                    <i data-lucide="user-check" class="w-8 h-8 text-white"></i>
-                </div>
-                <div>
-                    <h1 class="text-3xl font-bold text-white">Absensi Pembimbing</h1>
-                    <p class="text-gray-400">Input absensi harian untuk pembimbing.</p>
-                </div>
+        <header class="page-header">
+            <div class="header-icon">
+                <i data-lucide="user-check" class="w-10 h-10 text-white"></i>
             </div>
-            <!-- Tombol Install Aplikasi -->
-            <button id="installAppBtn" class="btn btn-secondary hidden">
-                <i data-lucide="download" class="w-4 h-4 mr-2"></i>
-                <span>Install</span>
-            </button>
+            <div class="flex-1 flex justify-between items-center">
+                <div>
+                    <h1 class="text-4xl font-extrabold tracking-tight text-white">Absensi Pembimbing</h1>
+                    <p class="text-gray-400 text-lg">Input absensi harian untuk pembimbing LTQ.</p>
+                </div>
+                <button id="installAppBtn" class="hidden bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl transition-all flex items-center gap-2 border border-white/5">
+                    <i data-lucide="download" class="w-5 h-5 text-white"></i>
+                    <span class="text-sm font-bold text-white">Install App</span>
+                </button>
+            </div>
         </header>
 
-        <!-- Input Absensi Card -->
-        <div class="card p-6">
-            <h2 class="text-xl font-semibold text-white mb-4">Input Absensi Harian</h2>
-            <form id="attendanceForm" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="attendanceDate" class="block mb-2 font-medium">Tanggal</label>
-                        <input type="date" id="attendanceDate" class="form-input" required>
+        <!-- Main Card -->
+        <div class="glass-card p-8">
+            <form id="attendanceForm" class="space-y-8">
+                <!-- Config Section -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="form-group">
+                        <label for="attendanceDate">Tanggal Absensi</label>
+                        <input type="date" id="attendanceDate" class="input-glass" required>
                     </div>
-                    <div>
-                        <label class="block mb-2 font-medium">Sesi</label>
-                        <div class="flex gap-4 h-full items-center">
-                            <label class="flex items-center gap-2"><input type="radio" name="session" value="pagi" class="form-checkbox" checked> Pagi</label>
-                            <label class="flex items-center gap-2"><input type="radio" name="session" value="sore" class="form-checkbox"> Sore</label>
+                    <div class="form-group">
+                        <label>Sesi Halaqoh</label>
+                        <div class="session-toggle">
+                            <label>
+                                <input type="radio" name="session" value="pagi" checked>
+                                <span>Pagi</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="session" value="sore">
+                                <span>Sore</span>
+                            </label>
                         </div>
                     </div>
                 </div>
-                <div>
-                    <label class="block mb-2 font-medium">Absensi Pembimbing</label>
-                    <p class="text-sm text-gray-400 mb-3">Semua pembimbing dianggap hadir. Centang nama yang tidak hadir.</p>
-                    <!-- Search Input -->
-                    <div class="relative mb-2">
-                        <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"></i>
-                        <input type="text" id="mentorSearchInput" placeholder="Cari nama pembimbing..." class="form-input pl-9 w-full">
+
+                <!-- Stats & Search -->
+                <div class="space-y-4">
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="stat-item">
+                            <span id="statTotal" class="stat-value">0</span>
+                            <span class="stat-label">Total</span>
+                        </div>
+                        <div class="stat-item border-green-500/20">
+                            <span id="statPresent" class="stat-value text-green-400">0</span>
+                            <span class="stat-label">Hadir</span>
+                        </div>
+                        <div class="stat-item border-red-500/20">
+                            <span id="statAbsent" class="stat-value text-red-400">0</span>
+                            <span class="stat-label">Izin/Alpa</span>
+                        </div>
                     </div>
-                    <div id="attendanceMentorList" class="space-y-1 max-h-96 overflow-y-auto p-2 bg-gray-900 rounded-md"></div>
-                    <p id="mentorSearchEmpty" class="hidden text-center text-gray-500 text-sm py-4">Pembimbing tidak ditemukan.</p>
+
+                    <div class="relative">
+                        <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500"></i>
+                        <input type="text" id="mentorSearchInput" placeholder="Cari nama pembimbing..."
+                            class="input-glass pl-12">
+                    </div>
                 </div>
-                <div class="pt-2 text-right">
-                    <button type="submit" id="saveAttendanceBtn" class="btn btn-primary"><i data-lucide="save" class="w-4 h-4 mr-2"></i><span>Simpan Absensi</span></button>
+
+                <!-- List Section -->
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-bold uppercase tracking-widest text-gray-500">Daftar Pembimbing</h3>
+                        <span class="text-[10px] text-gray-500 italic">*Centang jika Tidak Hadir</span>
+                    </div>
+                    
+                    <div id="attendanceMentorList" class="mentor-list">
+                        <!-- Items injected by JS -->
+                    </div>
+
+                    <p id="mentorSearchEmpty" class="hidden text-center py-12 text-gray-500 italic bg-white/5 rounded-2xl">
+                        <i data-lucide="user-x" class="w-12 h-12 mx-auto mb-3 opacity-20"></i>
+                        Pembimbing tidak ditemukan
+                    </p>
+                </div>
+
+                <!-- Action Button -->
+                <div class="pt-6 border-t border-white/5">
+                    <button type="submit" id="saveAttendanceBtn" class="premium-btn">
+                        <i data-lucide="save" class="w-5 h-5"></i>
+                        <span>Simpan Absensi</span>
+                    </button>
                 </div>
             </form>
         </div>
     </div>
-    
+
     <!-- Toast Notification -->
     <div id="toast" class="toast">
         <p id="toastMessage"></p>
     </div>
 
-    <script type="module" src="js/absensi-pembimbing.js"></script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <script src="js/absensi-pembimbing.js"></script>
 </body>
+
 </html>
