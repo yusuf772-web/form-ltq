@@ -29,6 +29,14 @@ window.onload = function () {
         }
     });
 
+    const bottomMenuBtn = document.getElementById('bottomMenuBtn');
+    if (bottomMenuBtn) {
+        bottomMenuBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            openSidebar();
+        });
+    }
+
     overlay.addEventListener('click', closeSidebar);
 
     // --- Tab Switch ---
